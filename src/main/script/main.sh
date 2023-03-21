@@ -8,9 +8,10 @@ function main {
   local storeDefaultArgs=false
   local execution=false
   local verbose=false
+  local contextFile="context"
 
   # read default variables first
-  [[ -f "$home/config/default" ]] && args=($(peOptionContext "$home/config/default" ${args[@]}))
+  [[ -f "$home/context/default" ]] && args=($(peOptionContext "$home/context/default" ${args[@]}))
   local defaultArgs=(${args[@]})
 
   while [[ $# -gt 0 ]]; do
@@ -32,12 +33,31 @@ function main {
         ;;
 
       context) # read all stored variables
-        args=($(peOptionContext "$home/config/context" ${args[@]}))
+        args=($(peOptionContext "$home/context/context" ${args[@]}))
+        shift
+        ;;
+
+      context-list) # read all available contexts
+        ls "$home/context"
+        exit 0
+        ;;
+
+      context/*) # read all stored variables from specific context
+        contextFile=${1/"context/"/}
+        [[ -z $contextFile ]] && contextFile="context"
+        args=($(peOptionContext "$home/context/$contextFile" ${args[@]}))
         shift
         ;;
 
       store) # store all set variables
         storeArgs=true
+        shift
+        ;;
+
+      store/*) # store all set variables in specific context
+        storeArgs=true
+        contextFile=${1/"store/"/}
+        [[ -z $contextFile ]] && contextFile="context"
         shift
         ;;
 
@@ -62,8 +82,15 @@ function main {
         ;;
 
       cleanup) # unset all stored variables values it is executed immediately end interrupt further execution
-        [[ -f "$home/config/context" ]] && rm "$home/config/context"
-        [[ -f "$home/config/default" ]] && rm "$home/config/default"
+        [[ -f "$home/context/context" ]] && rm "$home/context/context"
+        [[ -f "$home/context/default" ]] && rm "$home/context/default"
+        exit 0
+        ;;
+
+      cleanup/*)# unset all stored variables values in specific context, it is executed immediately end interrupt further execution
+        contextFile=${1/"store/"/}
+        [[ -z $contextFile ]] && contextFile="context"
+        [[ -f "$home/context/$contextFile" ]] && rm "$home/context/$contextFile"
         exit 0
         ;;
 
@@ -72,8 +99,8 @@ function main {
       -) # start sub execution process
         execution=true
         startArgs=(${args[@]})
-        [[ $storeArgs = true        ]] && echo "${args[@]}" > "$home/config/context"
-        [[ $storeDefaultArgs = true ]] && echo "${args[@]}" > "$home/config/default"
+        [[ $storeArgs = true        ]] && echo "${args[@]}" > "$home/context/$contextFile"
+        [[ $storeDefaultArgs = true ]] && echo "${args[@]}" > "$home/context/default"
 
         local mode="none"
         local app=
@@ -189,7 +216,7 @@ function main {
 
 #  echo " ${args[@]}"
   [[ $execution = false ]] && peArgsUnwrap ${args[@]}
-  [[ $execution = false ]] && [[ $storeArgs = true        ]] && echo "${args[@]}" > "$home/config/context"
-  [[ $execution = false ]] && [[ $storeDefaultArgs = true ]] && echo "${args[@]}" > "$home/config/default"
+  [[ $execution = false ]] && [[ $storeArgs = true        ]] && echo "${args[@]}" > "$home/context/$contextFile"
+  [[ $execution = false ]] && [[ $storeDefaultArgs = true ]] && echo "${args[@]}" > "$home/context/default"
 
 }

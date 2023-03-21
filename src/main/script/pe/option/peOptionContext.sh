@@ -5,7 +5,7 @@ function peOptionContext {
   local contextArgs=()
 
   # read raw args file
-  [[ -f "$contextFile" ]] && contextArgs=(`cat "$home/config/context"`)
+  [[ -f "$contextFile" ]] && contextArgs=(`cat "$contextFile"`)
 
   local type="key"
   for it in ${contextArgs[@]}
