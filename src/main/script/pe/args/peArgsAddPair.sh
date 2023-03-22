@@ -7,12 +7,14 @@ function peArgsAddPair {
 
     # for key is array split and iterate
     if [[ $(peArgsIsArray "$argKey") = true ]]; then
-      local split=(${argKey//[\[\],]/ })
-      newArgs=($@)
-      for sval in ${split[@]}
+      local split=("${argKey//[\[\],]/ }")
+      newArgs=("$@")
+      for sval in "${split[@]}"
       do
-        newArgs=($(peArgsAddPair "$sval" "" ${newArgs[@]}))
+        eval "newArgs=($(peArgsAddPair "$sval" "" "${newArgs[@]}"))"
       done
+
+      for it in "${newArgs[@]}" ; do echo "'$it'" ; done
 
     # if key is single regular value
     else
@@ -27,15 +29,15 @@ function peArgsAddPair {
 
 
 
-      for it in $@
+      for it in "$@"
       do
 
-        # for key remember and swith to value
+        # for key remember and switch to value
         if [[ $type = "key" ]]; then
           key="$it"
           type="value"
 
-        # for value do checks and swith to key
+        # for value do checks and switch to key
         elif [[ $type = "value" ]]; then
           value="$it"
           type="key"
@@ -62,8 +64,9 @@ function peArgsAddPair {
 
           fi
 
-          # insert calculated pair key value
-          newArgs=(${newArgs[@]} "$key" "$value")
+          # return calculated pair key value
+          echo "'$key'"
+          echo "'$value'"
 
         fi
 
@@ -72,10 +75,8 @@ function peArgsAddPair {
 
 
       # if there were nothing to replace add new value
-      [[ $isNew = true ]] && newArgs=(${newArgs[@]} "$argKey" "$argValue")
+      [[ $isNew = true ]] && echo "'$argKey'"
+      [[ $isNew = true ]] && echo "'$argValue'"
 
     fi
-
-    # return
-    echo " ${newArgs[@]}"
 }

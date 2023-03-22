@@ -5,12 +5,14 @@ function peArgsRemoveKey {
 
     # for key is array split and iterate
     if [[ $(peArgsIsArray "$argKey") = true ]]; then
-      local split=(${argKey//[\[\],]/ })
-      newArgs=($@)
-      for sval in ${split[@]}
+      local split=("${argKey//[\[\],]/ }")
+      newArgs=("$@")
+      for sval in "${split[@]}"
       do
-        newArgs=($(peArgsRemoveKey "$sval" "" ${newArgs[@]}))
+        eval "newArgs=($(peArgsRemoveKey "$sval" "${newArgs[@]}"))"
       done
+
+      for it in "${newArgs[@]}" ; do echo "'$it'" ; done
 
     # if key is single regular value
     else
@@ -21,15 +23,15 @@ function peArgsRemoveKey {
 
 
 
-      for it in $@
+      for it in "$@"
       do
 
-        # for key remember and swith to value
+        # for key remember and switch to value
         if [[ $type = "key" ]]; then
           key="$it"
           type="value"
 
-        # for value do checks and swith to key
+        # for value do checks and switch to key
         elif [[ $type = "value" ]]; then
           value="$it"
           type="key"
@@ -38,7 +40,10 @@ function peArgsRemoveKey {
           local argKeyWithoutValue="${argKey/=*/}"
 
           # not left if keys are the same with or without '='
-          [[ ! "$key" = "$argKey" ]] && [[ ! "$keyWithoutValue" = "$argKeyWithoutValue" ]] && newArgs=(${newArgs[@]} "$key" "$value")
+          if [[ ! "$key" = "$argKey" ]] && [[ ! "$keyWithoutValue" = "$argKeyWithoutValue" ]]; then
+            echo "'$key'"
+            echo "'$value'"
+          fi
 
         fi
 
@@ -47,7 +52,4 @@ function peArgsRemoveKey {
 
 
     fi
-
-    # return
-    echo " ${newArgs[@]}"
 }

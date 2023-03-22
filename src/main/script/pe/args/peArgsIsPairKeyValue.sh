@@ -4,5 +4,11 @@ function peArgsIsPairKeyValue {
   # second value is not array
   # first value has no =
   # second value is not empty
-  [[ ! "$2" =~ ^-.* ]] && [[ ! "$1" =~ ^\[.*] ]] && [[ ! "$2" =~ ^\[.*] ]] && [[ ! "$1" =~ .*=.* ]] && [[ ! "$2" =~ .*=.* ]] && [[ ! "$2" = "" ]] && echo true || echo false
+     [[ ! "$2" =~ ^-.* ]] \
+  && [[ ! "$1" =~ ^\[.*] ]] \
+  && [[ ! "$2" =~ ^\[.*] ]] \
+  && [[ ! "$1" =~ .*=.* ]] \
+  && [[ ! "$2" =~ .*=.* ]] \
+  && [[ ! "$2" = "" ]] \
+  && echo true || echo false
 }

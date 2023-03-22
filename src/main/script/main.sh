@@ -10,9 +10,10 @@ function main {
   local verbose=false
   local contextFile="context"
 
+  [[ ! -d "$PE_CONTEXT_PATH/context" ]] && PE_CONTEXT_PATH="$home/context"
+
   # read default variables first
-  [[ -f "$home/context/default" ]] && args=($(peOptionContext "$home/context/default" ${args[@]}))
-  local defaultArgs=(${args[@]})
+  [[ -f "$PE_CONTEXT_PATH/context/default" ]] && eval "args=($(peOptionContext "$PE_CONTEXT_PATH/context/default" "${args[@]}"))"
 
   while [[ $# -gt 0 ]]; do
     case $1 in
@@ -33,19 +34,34 @@ function main {
         ;;
 
       context) # read all stored variables
-        args=($(peOptionContext "$home/context/context" ${args[@]}))
+        eval "args=($(peOptionContext "$PE_CONTEXT_PATH/context/context" "${args[@]}"))"
         shift
         ;;
 
-      context-list) # read all available contexts
-        ls "$home/context"
+      c-list) # read all available contexts
+        ls "$PE_CONTEXT_PATH/context"
         exit 0
         ;;
 
-      context/*) # read all stored variables from specific context
+      context-list) # read all available contexts
+        local contextFiles=
+        mapfile -t contextFiles < <(ls "$PE_CONTEXT_PATH/context")
+        for file in "${contextFiles[@]}"
+        do
+          echo -e "${C_GREEN}Context: ${C_WHITE}$file${C_RESET}"
+          echo ""
+          cat "$PE_CONTEXT_PATH/context/$file"
+          echo ""
+        done
+        exit 0
+        ;;
+
+      context/*|c/*) # read all stored variables from specific context
+
         contextFile=${1/"context/"/}
+        contextFile=${contextFile/"c/"/}
         [[ -z $contextFile ]] && contextFile="context"
-        args=($(peOptionContext "$home/context/$contextFile" ${args[@]}))
+        eval "args=($(peOptionContext "$PE_CONTEXT_PATH/context/$contextFile" "${args[@]}"))"
         shift
         ;;
 
@@ -54,9 +70,10 @@ function main {
         shift
         ;;
 
-      store/*) # store all set variables in specific context
+      store/*|s/*) # store all set variables in specific context
         storeArgs=true
         contextFile=${1/"store/"/}
+        contextFile=${contextFile/"s/"/}
         [[ -z $contextFile ]] && contextFile="context"
         shift
         ;;
@@ -82,15 +99,15 @@ function main {
         ;;
 
       cleanup) # unset all stored variables values it is executed immediately end interrupt further execution
-        [[ -f "$home/context/context" ]] && rm "$home/context/context"
-        [[ -f "$home/context/default" ]] && rm "$home/context/default"
+        [[ -f "$PE_CONTEXT_PATH/context/context" ]] && rm "$PE_CONTEXT_PATH/context/context"
+        [[ -f "$PE_CONTEXT_PATH/context/default" ]] && rm "$PE_CONTEXT_PATH/context/default"
         exit 0
         ;;
 
       cleanup/*)# unset all stored variables values in specific context, it is executed immediately end interrupt further execution
-        contextFile=${1/"store/"/}
+        contextFile=${1/"cleanup/"/}
         [[ -z $contextFile ]] && contextFile="context"
-        [[ -f "$home/context/$contextFile" ]] && rm "$home/context/$contextFile"
+        [[ -f "$PE_CONTEXT_PATH/context/$contextFile" ]] && rm "$PE_CONTEXT_PATH/context/$contextFile"
         exit 0
         ;;
 
@@ -98,9 +115,9 @@ function main {
       # --------------------------------------------------------------------------------------------------------------------------------
       -) # start sub execution process
         execution=true
-        startArgs=(${args[@]})
-        [[ $storeArgs = true        ]] && echo "${args[@]}" > "$home/context/$contextFile"
-        [[ $storeDefaultArgs = true ]] && echo "${args[@]}" > "$home/context/default"
+        startArgs=("${args[@]}")
+        [[ $storeArgs = true        ]] && peArgsStore "$PE_CONTEXT_PATH/context/$contextFile" "${args[@]}"
+        [[ $storeDefaultArgs = true ]] && peArgsStore "$PE_CONTEXT_PATH/context/default" "${args[@]}"
 
         local mode="none"
         local app=
@@ -122,7 +139,7 @@ function main {
               ;;
             reset)
               if [[ $mode = "new" ]]; then
-                args=(${startArgs[@]})
+                args=("${startArgs[@]}")
                 mode="set"
                 shift
               fi
@@ -133,6 +150,24 @@ function main {
                 mode="set"
                 shift
               fi
+              ;;
+            save-as)
+              shift
+              local exec="$1"
+              shift
+              shift
+              echo "$@" > "$PE_CONTEXT_PATH/execs/$exec"
+              exit 0
+              ;;
+            run)
+              shift
+              local exec="$1"
+              shift
+              local execFile=
+              local verboseCmd=
+              [[ -f "$PE_CONTEXT_PATH/execs/$exec" ]] && readarray -t execFile < "$PE_CONTEXT_PATH/execs/$exec"
+              [[ $verbose = true ]] && verboseCmd=" verbose" && echo "EXEC: pe$verboseCmd clear ${args[*]} - ${execFile[*]}"
+              eval "pe$verboseCmd clear ${args[*]} - ${execFile[*]}"
               ;;
             -)
                 mode="new"
@@ -154,12 +189,12 @@ function main {
                   *)
 
                     if [[ $mode = "set" ]]; then # add argument
-                      args=($(peArgsAddPair "$1" "$2" ${args[@]}))
+                      eval "args=($(peArgsAddPair "$1" "$2" "${args[@]}"))"
                       [[ $(peArgsIsPairKeyValue "$1" "$2") = "true" ]] && shift
                       shift
 
                     elif [[ $mode = "unset" ]]; then # remove variable key
-                      args=($(peArgsRemoveKey "$1" ${args[@]}))
+                      eval "args=($(peArgsRemoveKey "$1" "${args[@]}"))"
                       shift
 
                     elif [[ $mode = "new" ]]; then # start new command
@@ -175,7 +210,7 @@ function main {
                     elif [[ $mode = "cmd" ]]; then # add to cmd
                       local value="$1"
                       [[ "$value" =~ " " ]] && value="\"$value\""
-                      [[ ! -z $cmd ]] && cmd="$cmd $value"
+                      [[ -n $cmd ]] && cmd="$cmd $value"
                       [[ -z $cmd   ]] && cmd="$value"
                       shift
                     fi
@@ -184,8 +219,8 @@ function main {
                 esac
               done
 
-              [[ $mode = "cmd" ]] && [[ $verbose = true ]] && echo "CMD: $app $(peArgsUnwrap ${args[@]}) $cmd"
-              ! eval "$app $(peArgsUnwrap ${args[@]}) $cmd" && exit 1
+              [[ $mode = "cmd" ]] && [[ $verbose = true ]] && echo "CMD: $app $(peArgsUnwrap "${args[@]}") $cmd"
+              [[ $mode = "cmd" ]] && ! eval "$app $(peArgsUnwrap "${args[@]}") $cmd" && exit 1
 
 
 
@@ -199,13 +234,11 @@ function main {
       *)
         # add argument
         if [[ $setArgsEnabled = true ]]; then
-          args=($(peArgsAddPair "$1" "$2" ${args[@]}))
+          eval "args=($(peArgsAddPair "$1" "$2" "${args[@]}"))"
           [[ $(peArgsIsPairKeyValue "$1" "$2") = "true" ]] && shift
-
         # remove argument
         else
-          args=($(peArgsRemoveKey "$1" ${args[@]}))
-
+          eval "args=($(peArgsRemoveKey "$1" "${args[@]}"))"
         fi
 
         shift
@@ -214,9 +247,11 @@ function main {
     esac
   done
 
-#  echo " ${args[@]}"
-  [[ $execution = false ]] && peArgsUnwrap ${args[@]}
-  [[ $execution = false ]] && [[ $storeArgs = true        ]] && echo "${args[@]}" > "$home/context/$contextFile"
-  [[ $execution = false ]] && [[ $storeDefaultArgs = true ]] && echo "${args[@]}" > "$home/context/default"
+  if [[ $execution = false ]]; then
+#    echo "${args[*]/#/ARG:}"
+    peArgsUnwrap " ${args[@]}"
+    [[ $storeArgs = true        ]] && peArgsStore "$PE_CONTEXT_PATH/context/$contextFile" "${args[@]}"
+    [[ $storeDefaultArgs = true ]] && peArgsStore "$PE_CONTEXT_PATH/context/default" "${args[@]}"
+  fi
 
 }

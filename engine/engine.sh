@@ -10,6 +10,7 @@ function engineCreateContext {
 
   # read main file
   . "$home/src/main/script/main.sh"
+  [[ -f "$home/config/config.sh" ]] && . "$home/config/config.sh"
 }
 
 function engineStart {

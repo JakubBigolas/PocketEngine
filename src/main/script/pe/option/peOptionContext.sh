@@ -1,14 +1,14 @@
 function peOptionContext {
   local contextFile=$1
   shift
-  local args=($@)
+  local args=("$@")
   local contextArgs=()
 
   # read raw args file
-  [[ -f "$contextFile" ]] && contextArgs=(`cat "$contextFile"`)
+  [[ -f "$contextFile" ]] && readarray -t contextArgs < "$contextFile"
 
   local type="key"
-  for it in ${contextArgs[@]}
+  for it in "${contextArgs[@]}"
   do
     if [[ $type = "key" ]]; then
       key="$it"
@@ -17,10 +17,11 @@ function peOptionContext {
       value="$it"
       type="key"
 
-      args=($(peArgsAddPair "$key" "$value" ${args[@]}))
+      eval "args=($(peArgsAddPair "$key" "$value" "${args[@]}"))"
 
     fi
   done
 
-  echo " ${args[@]}"
+  for arg in "${args[@]}" ; do echo "'$arg'" ; done
+
 }
