@@ -8,7 +8,7 @@ function peArgsStore {
 
   for arg in "$@"
   do
-    echo "'$arg'" >> "$path"
+    printf "%s\n" "${arg//$'\n'/\n}" >> "$path"
   done
 
 }

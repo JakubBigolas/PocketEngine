@@ -1,4 +1,4 @@
-function peArgsRemoveKey {
+function peArgsChooseKey {
     local newArgs=()
     local argKey="$1"
     shift
@@ -23,9 +23,10 @@ function peArgsRemoveKey {
         local keyWithoutValue="${key/=*/}"
 
         # not left if keys are the same with or without '='
-        if [[ ! "$key" == "$argKey" ]] && [[ ! "$keyWithoutValue" == "$argKey" ]]; then
+        if [[ "$key" == "$argKey" ]] || [[ "$keyWithoutValue" = "$argKey" ]]; then
           peArgsWrap "$key"
           peArgsWrap "$value"
+          break
         fi
 
       fi

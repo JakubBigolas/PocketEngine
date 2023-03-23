@@ -1,4 +1,4 @@
-function peOptionContext {
+function peArgsRestore {
   local contextFile=$1
   shift
   local args=("$@")
@@ -22,6 +22,6 @@ function peOptionContext {
     fi
   done
 
-  for arg in "${args[@]}" ; do echo "'$arg'" ; done
+  for arg in "${args[@]}" ; do peArgsWrap "$arg" ; done
 
 }

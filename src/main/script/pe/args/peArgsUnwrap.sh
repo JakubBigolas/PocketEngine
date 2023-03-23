@@ -1,9 +1,10 @@
 function peArgsUnwrap {
-  local args=("$@")
-  local parsedArgs="${args[*]}"
-  local parsedArgs="${parsedArgs[*]//" [#] "/ }"
-  local parsedArgs="${parsedArgs[*]//" [#]"/}"
-  local parsedArgs="${parsedArgs[*]//"[#] "/}"
-  local parsedArgs="${parsedArgs[*]//"[#]"/}"
-  echo " $parsedArgs"
+  local args=()
+
+  for arg in "$@"
+  do # remove internal args
+    [[ ! "$arg" =~ ^\[#.*\]$ ]] && [[ ! "$arg" =~ ^\"\[#.*\]\"$ ]] && args=("${args[@]}" "$arg")
+  done
+
+  echo " ${args[*]}"
 }
