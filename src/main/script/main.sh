@@ -9,6 +9,7 @@ function main {
   local execution=false
   local verbose=false
   local contextFile="context"
+  local devMode=false
 
   [[ ! -d "$PE_CONTEXT_PATH/context" ]] && PE_CONTEXT_PATH="$home/context"
 
@@ -28,8 +29,14 @@ function main {
         exit 0
         ;;
 
+      dev-mode) # enable development mode
+        devMode=true
+        verbose=true
+        shift
+        ;;
+
       verbose) # print command before execution
-        verbose=true;
+        verbose=true
         shift
         ;;
 
@@ -179,7 +186,7 @@ function main {
               exit 0
               ;;
             run)
-              peOptionRun "$2" "$verbose" "${args[@]}"
+              peOptionRun "$2" "$verbose" "$devMode" "${args[@]}"
               shift
               shift
               ;;
@@ -203,7 +210,11 @@ function main {
                   *)
 
                     if [[ $mode = "set" ]]; then # add argument
-                      eval "args=($(peArgsAddPair "$1" "$2" "${args[@]}"))"
+
+                      ! key=$(peArgsReplace   "$1" "${args[@]}" "${startArgs[@]}") && echo "$key" && exit 1
+                      ! value=$(peArgsReplace "$2" "${args[@]}" "${startArgs[@]}") && echo "$value" && exit 1
+
+                      eval "args=($(peArgsAddPair "$key" "$value" "${args[@]}"))"
                       [[ $(peArgsIsPairKeyValue "$1" "$2") = "true" ]] && shift
                       shift
 
@@ -219,7 +230,6 @@ function main {
 
                     elif [[ $mode = "new" ]]; then # start new command
                       app=$1
-#                      app="$(peArgsWrap "$1")"
                       mode="cmd"
                       cmd=
                       shift
@@ -231,6 +241,7 @@ function main {
                     elif [[ $mode = "cmd" ]]; then # add to cmd
                       local value=$1
                       value=$(peArgsWrap "$1")
+                      ! value=$(peArgsReplace "$value" "${args[@]}" "${startArgs[@]}") && echo "$value" && exit 1
                       [[ -n $cmd ]] && cmd="$cmd $value" || cmd="$value"
                       shift
                     fi
@@ -243,7 +254,7 @@ function main {
               eval "packagedArgs=($(peArgsWrap $(peArgsWrap "${args[@]}")))"
               local command="$app $(peArgsUnwrap "${packagedArgs[@]}") $cmd"
               [[ $mode = "cmd" ]] && [[ $verbose = true ]] && echo "CMD: $command"
-              [[ $mode = "cmd" ]] && ! eval "$command" && exit 1
+              [[ $devMode = false ]] && [[ $mode = "cmd" ]] && ! eval "$command" && exit 1
 
           esac
         done

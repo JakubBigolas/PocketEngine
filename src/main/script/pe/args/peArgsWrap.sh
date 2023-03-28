@@ -3,8 +3,10 @@ function peArgsWrap {
 
     local arg="$1"
     shift
-    arg="${arg//"\\"/\\\\}"
-    arg="${arg//\"/\\\"}"
+    arg="${arg//"\\"/\\\\}"  # \ -> \\
+    arg="${arg//\"/\\\"}"    # " -> \"
+    arg="${arg//\`/\\\`}"    # ` -> \`
+    arg="${arg//\$/\\\$}"    # $ -> \$
 
     if [[ "$1" == *$'\n'* ]]; then
 

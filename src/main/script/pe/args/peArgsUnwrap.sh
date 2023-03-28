@@ -6,5 +6,8 @@ function peArgsUnwrap {
     [[ ! "$arg" =~ ^\[#.*\]$ ]] && [[ ! "$arg" =~ ^\"\[#.*\]\"$ ]] && args=("${args[@]}" "$arg")
   done
 
-  echo " ${args[*]}"
+  local unwrap=" ${args[*]}"
+  local unwrap=${unwrap//\\\`/\`} # \` -> `
+  local unwrap=${unwrap//\\\$/\$} # \$ -> $
+  echo " $unwrap"
 }
