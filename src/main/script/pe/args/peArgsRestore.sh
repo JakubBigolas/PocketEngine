@@ -17,11 +17,13 @@ function peArgsRestore {
       value="$it"
       type="key"
 
+      # evaluate in array-safe way
       eval "args=($(peArgsAddPair "$key" "$value" "${args[@]}"))"
 
     fi
   done
 
+  # return in array-safe way
   for arg in "${args[@]}" ; do peArgsWrap "$arg" ; done
 
 }

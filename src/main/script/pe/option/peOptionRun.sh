@@ -34,7 +34,7 @@ function peOptionRun {
   # execute as subcommand
   local command="pe$verboseCmd$devModeCmd clear ${execArgs[*]} - ${commands[*]}"
   [[ $verbose = true ]] && echo "EXE: $command"
-  eval "$command"
+  ! eval "$command" && exit 1
   [[ $verbose = true ]] && echo "EXE: DONE"
 
 }
