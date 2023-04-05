@@ -1,8 +1,4 @@
 function main {
-  local home="$1"
-  shift
-
-
 
   # variables available in whole process ---------------------------------------------
 

@@ -5,8 +5,9 @@
 function engineCreateContext {
   local home="$1"
 
-  engineImport "$POCKET_ENGINE_HOME"
-  [[ ! "$POCKET_ENGINE_HOME" = "$home" ]] && engineImport "$home"
+  # TODO there is need to add function to load libs from external repository
+
+  [[ "$POCKET_ENGINE_HOME" = "$home" ]] && engineImport "$home"
 
   # read main file
   . "$home/src/main/script/main.sh"
@@ -15,6 +16,7 @@ function engineCreateContext {
 
 function engineStart {
   local home="$1"
+  shift
 
   main "$@"
 }
