@@ -1,5 +1,5 @@
 function main {
-  local home=$1
+  local home="$1"
   shift
 
 

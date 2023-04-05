@@ -1,0 +1,3 @@
+#!/bin/bash
+
+. "$POCKET_ENGINE_HOME/engine/engine.sh"

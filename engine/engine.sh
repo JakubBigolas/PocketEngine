@@ -1,216 +1,3 @@
-[[ ! -f "$POCKET_ENGINE_HOME/engine/engine.sh" ]] && echo "ERROR: PocketEngine home variable not set properly: \$POCKET_ENGINE_HOME=$POCKET_ENGINE_HOME" && exit 1
-
-########### MANAGEMENT / PUBLIC INTERFACE ####################################################
-
-function engineCreateContext {
-  local home="$1"
-
-  engineImport "$POCKET_ENGINE_HOME"
-  [[ ! "$POCKET_ENGINE_HOME" = "$home" ]] && engineImport "$home"
-
-  # read main file
-  . "$home/src/main/script/main.sh"
-  [[ -f "$home/config/config.sh" ]] && . "$home/config/config.sh"
-}
-
-function engineStart {
-  local home="$1"
-
-  main "$@"
-}
-
-function engineImport {
-  local home="$1"
-
-  # read libs and scr index file
-  [[ -f "$home/libs/main/script/index" ]] && engineReadIndex "$home" "libs/main/script"
-  [[ -f "$home/src/main/script/index"  ]] && engineReadIndex "$home" "src/main/script"
-
-  # run tests
-  POCKET_ENGINE_ENABLE_TESTS=true
-  POCKET_ENGINE_TESTS_ERRORS=0
-  POCKET_ENGINE_TESTS_HIDE_CORRECT=true
-
-  if [[ $POCKET_ENGINE_ENABLE_TESTS = true ]]; then
-    [[ -f "$home/libs/test/script/index" ]] && engineRunIndexTests "$home" "libs/test/script"
-    [[ -f "$home/src/test/script/index"  ]] && engineRunIndexTests "$home" "src/test/script"
-    [[ $POCKET_ENGINE_TESTS_ERRORS -gt 0 ]] && echo "ERRORS IN TESTS $POCKET_ENGINE_TESTS_ERRORS"
-  fi
-
-}
-
-
-
-
-
-
-
-
-
-########### IMPORT SOURCES ####################################################
-
-function engineReadIndex {
-  local home="$1"
-  local path="$2"
-
-  # abort if there is no index file
-  [[ ! -f "$home/$path/index" ]] && echo "ERROR: There is no index file in path '$home/$path/index'" && exit 1
-  # or read file line by line
-  readarray -t file < "$home/$path/index"
-
-  # if index is empty read all directory files
-  [[ -z "${file[*]}" ]] && file=($(ls "$home/$path"))
-
-  # for each import file position
-  for line in "${file[@]}"
-  do
-      line="${line//[$'\t\r\n']/}"
-
-      [[ $line =~ index      ]]  && continue # ommit every index file
-      [[ $line =~ main.sh    ]]  && continue # ommit every main.sh file
-      [[ $line =~ ^#.*       ]]  && continue # ommit comment lines
-      [[ $line =~ ^\s*$      ]]  && continue # ommit empty lines
-
-      engineReadIndexPosition "$home" "$path" "$line"
-  done
-}
-
-function engineReadIndexPosition {
-  local home="$1"
-  local path="$2"
-  local file="$3"
-
-  local fullpath="$home/$path/$file"
-
-  # read file if exists
-  if [[ -f "$fullpath" ]] || [[ -f "$fullpath.sh" ]]; then
-    engineReadIndexFile "$home" "$path" "$file"
-
-  # read child index if filepath is directory
-  elif [[ -d "$fullpath" ]]; then
-    engineReadIndex "$home" "$path/$file"
-
-  # if there is no file or directory to read print error and exit
-  else
-    echo "ERROR: cannot read sources from any of paths:"
-    echo "- $fullpath"
-    echo "- $fullpath.sh"
-    exit 1
-  fi
-
-}
-
-function engineReadIndexFile {
-  local home="$1"
-  local path="$2"
-  local file="$3"
-
-  # run import file
-  local fullpath="$home/$path/$file"
-  [[ -f "$fullpath"    ]] && . "$fullpath"
-  [[ -f "$fullpath.sh" ]] && . "$fullpath.sh"
-}
-
-
-
-
-
-
-
-
-
-
-########### TEST SOURCES ######################################################
-
-function engineRunIndexTests {
-  local home="$1"
-  local path="$2"
-
-  # abort if there is no index file
-  [[ ! -f "$home/$path/index" ]] && echo "ERROR: There is no index file in path '$home/$path/index'" && exit 1
-  # or read file line by line
-  readarray -t file < "$home/$path/index"
-
-  # if index is empty read all directory files
-  [[ -z "${file[*]}" ]] && file=($(ls "$home/$path"))
-
-  # for each import file position
-  for line in "${file[@]}"
-  do
-      line="${line//[$'\t\r\n']/}"
-
-      [[ $line =~ index      ]]  && continue # ommit every index file
-      [[ $line =~ main.sh    ]]  && continue # ommit every main.sh file
-      [[ $line =~ ^#.*       ]]  && continue # ommit comment lines
-      [[ $line =~ ^\s*$      ]]  && continue # ommit empty lines
-
-      engineTestIndexPosition "$home" "$path" "$line"
-  done
-}
-
-function engineTestIndexPosition {
-  local home="$1"
-  local path="$2"
-  local file="$3"
-
-  local fullpath="$home/$path/$file"
-
-  # read file if exists
-  if [[ -f "$fullpath" ]] || [[ -f "$fullpath.test" ]] || [[ -f "$fullpath.test.sh" ]]; then
-    engineTestIndexFile "$home" "$path" "$file"
-
-  # read child index if filepath is directory
-  elif [[ -d "$fullpath" ]]; then
-    engineRunIndexTests "$home" "$path/$file"
-
-  # if there is no file or directory to read print error and exit
-  else
-    echo "ERROR: cannot read test from any of paths:"
-    echo "- $fullpath"
-    echo "- $fullpath.test"
-    echo "- $fullpath.test.sh"
-    exit 1
-  fi
-}
-
-function engineTestIndexFile {
-  local home="$1"
-  local path="$2"
-  local file="$3"
-
-  local fullpath="$home/${path/main/test}/$file"
-
-  # run test file
-  [[ -f "$fullpath" ]]         && . "$fullpath"         "$home" "$path" "$file"
-  [[ -f "$fullpath.test" ]]    && . "$fullpath.test"    "$home" "$path" "$file"
-  [[ -f "$fullpath.test.sh" ]] && . "$fullpath.test.sh" "$home" "$path" "$file"
-}
-
-function engineTest {
-  local name=$1
-  local expected=$2
-  local result=$3
-  if [ ! "$expected" = "$result" ]; then
-    echo "TEST: $name failed"
-    echo "EXPTECTED: "
-    echo "$expected"
-    echo "RESULT: "
-    echo "$result"
-    echo
-    POCKET_ENGINE_TESTS_ERRORS=$((POCKET_ENGINE_TESTS_ERRORS + 1))
-  elif [[ ! $POCKET_ENGINE_TESTS_HIDE_CORRECT = true ]]; then
-    echo "TEST: $name correct"
-  fi
-}
-
-function __testExecution {
-  engineTest "$__testHeader" "$__testExpect" "$__testActual"
-}
-
-
-
-
-
 ########### ENGINE MANAGEMENT #################################################
 
 if [[ $# -gt 0 ]]; then
@@ -301,19 +88,23 @@ if [[ $# -gt 0 ]]; then
     echo " Options: "
     echo ""
     echo " - create project PROJECT_NAME alias ALIAS"
-    echo "                - create project in specific path"
-    echo "                  # PROJECT_NAME is project specific name"
-    echo "                    that will be used for directory name"
-    echo "                  # ALIAS        is main script name"
-    echo "                    that will be used as command name"
-    echo "                    this keyword is optional"
-    echo " - index update - update all index files in project, by default only add new positions to index"
+    echo "                     - create project in specific path"
+    echo "                       # PROJECT_NAME is project specific name"
+    echo "                         that will be used for directory name"
+    echo "                       # ALIAS        is main script name"
+    echo "                         that will be used as command name"
+    echo "                         this keyword is optional"
+    echo " - index update      - update all index files in project, by default only add new positions to index"
     echo "   Additional arguments: "
     echo "   -c           - create index file if not appears in directory"
     echo "   -r           - remove positions from index if there is no matching src"
-    echo " - index check  - check index files structure"
-    echo " - build        - build project to one single script"
-    echo " - hash         - simple hash function and local variables names in current project build"
+    echo " - index check       - check index files structure"
+    echo " - index add         - add new file to project"
+    echo " - index add test    - add new test file to project"
+    echo " - index remove      - remove file from project"
+    echo " - index remove test - remove test file from project"
+    echo " - build             - build project to one single script"
+    echo " - hash              - simple hash function and local variables names in current project build"
     echo ""
   }
 
@@ -349,19 +140,21 @@ if [[ $# -gt 0 ]]; then
     [[ ! -d "$projectPath" ]] && echo "ERROR: project directory cannot be created $projectName" && exit 1
 
     # create main file
-    echo '#!/bin/bash'                                       >> "$projectPath/$alias"
-    echo ''                                                  >> "$projectPath/$alias"
-    echo '# project path'                                    >> "$projectPath/$alias"
-    echo "$projectHomeVar=\"$projectPath\""                  >> "$projectPath/$alias"
-    echo ''                                                  >> "$projectPath/$alias"
-    echo '# import config file'                              >> "$projectPath/$alias"
-    echo ''                                                  >> "$projectPath/$alias"
-    echo '# import and start engine'                         >> "$projectPath/$alias"
-    echo '. "$POCKET_ENGINE_HOME/engine/engine.sh"'          >> "$projectPath/$alias"
-    echo 'engineCreateContext "$POCKET_ENGINE_HOME"'         >> "$projectPath/$alias"
-    echo 'engineStart         "$POCKET_ENGINE_HOME" "$@"'    >> "$projectPath/$alias"
+    echo '#!/bin/bash'                                          >> "$projectPath/$alias"
+    echo ''                                                     >> "$projectPath/$alias"
+    echo '# project path'                                       >> "$projectPath/$alias"
+    echo "$projectHomeVar=\"$projectPath\""                     >> "$projectPath/$alias"
+    echo ''                                                     >> "$projectPath/$alias"
+    echo '# import config file'                                 >> "$projectPath/$alias"
+    echo ". \"\$$projectHomeVar/config/config.sh\""             >> "$projectPath/$alias"
+    echo ''                                                     >> "$projectPath/$alias"
+    echo '# import and start engine'                            >> "$projectPath/$alias"
+    echo ". \"\$POCKET_ENGINE_HOME/engine/engine-embed.sh\""    >> "$projectPath/$alias"
+    echo "engineCreateContext \"\$$projectHomeVar\""            >> "$projectPath/$alias"
+    echo "engineStart         \"\$$projectHomeVar\" \"\$@\""    >> "$projectPath/$alias"
 
     mkdir "$projectPath/config"
+    echo '# Add here any global configuration to keep it in one file' >> "$projectPath/config/config.sh"
 
     mkdir "$projectPath/libs"
     mkdir "$projectPath/libs/main"
@@ -379,6 +172,43 @@ if [[ $# -gt 0 ]]; then
     mkdir "$projectPath/src/test/script"
     echo "" >> "$projectPath/src/main/script/index"
     echo "" >> "$projectPath/src/test/script/index"
+
+    echo "# main script function where execution begins"  >> "$projectPath/src/main/script/main.sh"
+    echo "function main {"                                >> "$projectPath/src/main/script/main.sh"
+    echo "  # project home path"                          >> "$projectPath/src/main/script/main.sh"
+    echo "  local home=\"\$1\""                           >> "$projectPath/src/main/script/main.sh"
+    echo "  shift"                                        >> "$projectPath/src/main/script/main.sh"
+    echo ""                                               >> "$projectPath/src/main/script/main.sh"
+    echo "  echo \"Hello World!\""                        >> "$projectPath/src/main/script/main.sh"
+    echo ""                                               >> "$projectPath/src/main/script/main.sh"
+    echo "}"                                              >> "$projectPath/src/main/script/main.sh"
+
+
+    echo "Structure:"
+    echo ""
+    echo "$projectPath"
+    echo "   /$alias <- main script that load all scripts and start program"
+    echo "   /config             <- directory with config files"
+    echo "      /config.sh       <- default config file (may contains global variables)"
+    echo "   /libs               <- libraries directory"
+    echo "      /main            <- main libraries directory"
+    echo "         /script       <- library scripts"
+    echo "            /index     <- begin index file"
+    echo "      /test            <- test libraries directory"
+    echo "         /script       <- test library scripts"
+    echo "            /index     <- test begin index file"
+    echo "   /src                <- sources directory"
+    echo "      /main            <- main sources directory"
+    echo "         /script       <- main scripts directory"
+    echo "            /main.sh   <- script with main function that is called after load all program resources"
+    echo "            /index     <- begin index file"
+    echo "      /test            <- test sources directory"
+    echo "         /script       <- test scripts directory"
+    echo "            /index     <- test begin index file"
+    echo ""
+    echo "Created!"
+    echo "Remember to make file $projectPath/$alias executable"
+    echo "and add it to system PATH variable to make it easy to use."
 
   }
 
