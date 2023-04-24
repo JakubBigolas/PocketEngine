@@ -1,6 +1,6 @@
 function peOptionHelp {
   echo -e ""
-  echo -e "Usage: pe [options...] [arguments...] - [commands...] -- [repeat last command with another args/options]"
+  echo -e "Usage: pe [options...] [arguments...] - [commands] [command parametrization...] -- [repeat last command with another command parametrization]"
   echo -e ""
   echo -e "Main PocketEngine (\"pe\") purpose is to store and invoke multiple commands with configured arguments context as simple as it can be."
   echo -e ""
@@ -10,6 +10,8 @@ function peOptionHelp {
   pdToolHelpOptionPrint 'unset'            'start removing arguments cache sequention'
   pdToolHelpOptionPrint 'clear'            'remove all arguments from cache'
   pdToolHelpOptionPrint 'verbose'          'print each execution command before run'
+  pdToolHelpOptionPrint 'dev-mode'         'development mode allow to see what engine will produce and run without real execution'
+  pdToolHelpOptionPrint ''                 'enables verbose mode by default'
   pdToolHelpOptionPrint 'context-path'     'return path to store directory'
   pdToolHelpOptionPrint 'help'             'print this help info and exit'
   pdToolHelpOptionPrint 'version'          'print version info and exit'
@@ -71,22 +73,24 @@ function peOptionHelp {
   echo -e "  -KEY VALUE_LOOKS_LIKE_KEY=VALUE"
   echo -e "  KEY VALUE -KEY [#INTERNAL_KEY] #[VALUE_LOOKS_LIKE_KEY]"
   echo -e ""
-  echo -e "Example use story: "
+  echo -e "Command parametrization:"
+  echo -e " It is possible to make command parametrization more complex."
+  echo -e " If there is need to put arguments in specific way this replacement form may be used:"
   echo -e ""
-  echo -e "   $ pe - save-as buildAndRun - myCommand build -- -pDocker run"
-  echo -e "   ${C_BLUE}# create new command named \"buildAndRun\" that runs commands: \"myCommand build\" and \"myCommand -pDocker run\"${C_RESET}"
+  echo -e " Form \"Find value for key and replace it with or if there is no value then...\""
+  pdToolHelpOptionPrint "<<#?key#>>"         "...ommit"               26
+  pdToolHelpOptionPrint "<<#key#>>"          "...use empty string" 26
+  pdToolHelpOptionPrint "<<#key:?orElse#>>"  "...use "orElse""     26
+  pdToolHelpOptionPrint "<<#!key#>>"         "...finish with error"   26
   echo -e ""
-  echo -e "   $ pe default -project MyApp"
-  echo -e "   ${C_BLUE}# store arguments [-project MyApp] as default arguments loaded every time by default${C_RESET}"
+  echo -e " Form \"Find key or if it has no presence then...\""
+  pdToolHelpOptionPrint "<<##?key##>>"         "...ommit"               26
+  pdToolHelpOptionPrint "<<##key##>>"          "...use empty string" 26
+  pdToolHelpOptionPrint "<<##key?:orElse##>>"  "...use "orElse""     26
+  pdToolHelpOptionPrint "<<##!key##>>"         "...finish with error"   26
   echo -e ""
-  echo -e "   $ pe clear store store/env-dev -env dev"
-  echo -e "   ${C_BLUE}# clear argument cache to be sure there is no defaults and store arguments [-env dev] as named context \"env-dev\"${C_RESET}"
+  echo -e " Form \"Find key and replace it with replacement or if there is no key..."
+  pdToolHelpOptionPrint "<<##?key|replacement##>>" "...ommit" 26
+  pdToolHelpOptionPrint "<<##key|replacement##>>"  "...use empty string" 26
   echo -e ""
-  echo -e "   $ pe context/env-dev - run buildAndRun"
-  echo -e "   ${C_BLUE}# run commands stored under name \"buildAndRun\" with default args and env-dev args, it will be converted to commands:${C_RESET}"
-  echo -e "   ${C_BLUE}# $ \"myCommand\" \"-project\" \"MyApp\" \"-env\" \"dev\" \"build\"${C_RESET}"
-  echo -e "   ${C_BLUE}# $ \"myCommand\" \"-project\" \"MyApp\" \"-env\" \"dev\" \"-pDoker\" \"run\"${C_RESET}"
-  echo -e ""
-  echo -e "   $ pe cleanup"
-  echo -e "   ${C_BLUE}# if there is no need to keep default arguments remove them${C_RESET}"
 }
