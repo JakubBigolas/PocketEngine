@@ -1,4 +1,5 @@
-
+function engineEmbed {
+echo '
 
 
 ########### MANAGEMENT / PUBLIC INTERFACE ####################################################
@@ -213,4 +214,5 @@ function __testExecution {
 }
 
 
-
+'
+}

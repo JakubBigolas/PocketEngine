@@ -1,0 +1,23 @@
+
+Engine has been made to make bash script easier.
+
+
+To compile engine bin resources in one engine.sh file use script like this:
+
+# go to engine direcotry
+cd [...]/engine
+
+# compile all files in one script
+echo "" > engine.sh   ;   for f in `ls bin` ; do echo "# $f" >> engine.sh ; cat "bin/$f" >> engine.sh ; echo "" >> engine.sh ; done   ;   echo "engine \"\$@\"" >> engine.sh
+
+
+
+
+
+To build only engin-embed.sh use script like this
+
+# go to engine direcotry
+cd [...]/engine
+
+# run script to get function and print its result to engine-embed.sh
+. bin/engine-embed.sh && engineEmbed > engine-embed.sh
