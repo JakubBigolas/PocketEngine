@@ -1,10 +1,9 @@
 function peArgsRestore {
-  local contextFile=$1
-  shift
-  local args=("$@")
-  local contextArgs=()
+  local contextFile="$1" ; shift
+  local target="$1"      ; shift
 
   # read raw args file
+  local contextArgs=()
   [[ -f "$contextFile" ]] && readarray -t contextArgs < "$contextFile"
 
   local type="key"
@@ -17,13 +16,12 @@ function peArgsRestore {
       value="$it"
       type="key"
 
-      # evaluate in array-safe way
-      eval "args=($(peArgsAddPair "$key" "$value" "${args[@]}"))"
+      # replace newline replacements with newline
+      value="${value//\\n/$'\n'}"
+
+      peArgsAddPair "$key" "$value" $target
 
     fi
   done
-
-  # return in array-safe way
-  for arg in "${args[@]}" ; do peArgsWrap "$arg" ; done
 
 }

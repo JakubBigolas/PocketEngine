@@ -1,9 +1,13 @@
 function peArgsAddPair {
-    local newArgs=()
-    local argKey="$1"
-    local argValue="$2"
-    shift
-    shift
+    local argKey="$1"   ; shift
+    local argValue="$1" ; shift
+    local target="$1"   ; shift
+
+    local __return=()
+    local targetCopy=()
+
+    # copy from source reference
+    stdArraysCopy $target targetCopy
 
     # if there is no value then set empty replacement as arg value
     [[ $(peArgsIsPairKeyValue "$argKey" "$argValue") = false ]] && argValue="[#]"
@@ -13,7 +17,7 @@ function peArgsAddPair {
     local type="key"
     local isNew=true
 
-    for it in "$@"
+    for it in "${targetCopy[@]}"
     do
 
       # for key remember and switch to value
@@ -49,14 +53,17 @@ function peArgsAddPair {
         fi
 
         # return calculated pair key value
-        peArgsWrap "$key"
-        peArgsWrap "$value"
+        __return+=("$key")
+        __return+=("$value")
       fi
 
     done
 
     # if there were nothing to replace add new value
-    [[ $isNew = true ]] && peArgsWrap "$argKey"
-    [[ $isNew = true ]] && peArgsWrap "$argValue"
+    [[ $isNew = true ]] && __return+=("$argKey")
+    [[ $isNew = true ]] && __return+=("$argValue")
+
+    # copy by reference
+    stdArraysCopy __return $target
 
 }

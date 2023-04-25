@@ -1,7 +1,7 @@
 function peArgsChooseKey {
-    local newArgs=()
-    local argKey="$1"
-    shift
+    local argKey="$1" ; shift
+    local target="$1" ; shift
+    local __return=()
 
     local key=
     local value=
@@ -24,13 +24,14 @@ function peArgsChooseKey {
 
         # not left if keys are the same with or without '='
         if [[ "$key" == "$argKey" ]] || [[ "$keyWithoutValue" = "$argKey" ]]; then
-          peArgsWrap "$key"
-          peArgsWrap "$value"
+          __return=("$key" "$value")
           break
         fi
 
       fi
 
     done
+
+  stdArraysCopy __return $target
 
 }

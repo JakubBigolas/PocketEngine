@@ -1,13 +1,14 @@
 function peArgsUnwrap {
-  local args=()
+  local target="$1" ; shift
+
+  local __result=()
 
   for arg in "$@"
   do # remove internal args
-    [[ ! "$arg" =~ ^\[#.*\]$ ]] && [[ ! "$arg" =~ ^\"\[#.*\]\"$ ]] && args=("${args[@]}" "$arg")
+    if [[ ! "$arg" =~ ^\[#.*\]$ ]] && [[ ! "$arg" =~ ^\"\[#.*\]\"$ ]] ; then
+      __result+=("$arg")
+    fi
   done
 
-  local unwrap=" ${args[*]}"
-  local unwrap=${unwrap//\\\`/\`} # \` -> `
-  local unwrap=${unwrap//\\\$/\$} # \$ -> $
-  echo " $unwrap"
+  stdArraysCopy __result $target
 }

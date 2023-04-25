@@ -40,7 +40,7 @@ function main {
   peSetUpContextDris
 
   # read default variables first
-  [[ -f "$PE_CONTEXT_PATH/context/default" ]] && eval "args=($(peArgsRestore "$PE_CONTEXT_PATH/context/default" "${args[@]}"))"
+  [[ -f "$PE_CONTEXT_PATH/context/default" ]] && peArgsRestore "$PE_CONTEXT_PATH/context/default" args
 
 
 
@@ -88,7 +88,7 @@ function main {
 
       # read all stored variables from 'context'
       context)
-        eval "args=($(peArgsRestore "$PE_CONTEXT_PATH/context/context" "${args[@]}"))"
+        peArgsRestore "$PE_CONTEXT_PATH/context/context" args
         shift
         ;;
 
@@ -97,7 +97,7 @@ function main {
         contextFile=${1/"context/"/}
         contextFile=${contextFile/"c/"/}
         [[ -z $contextFile ]] && contextFile="context"
-        eval "args=($(peArgsRestore "$PE_CONTEXT_PATH/context/$contextFile" "${args[@]}"))"
+        peArgsRestore "$PE_CONTEXT_PATH/context/$contextFile" args
         shift
         ;;
 
@@ -191,7 +191,7 @@ function main {
 
         # perform argument storing if requested before executions
         [[ $storeArgs = true        ]] && peArgsStore "$PE_CONTEXT_PATH/context/$contextFile" "${args[@]}"
-        [[ $storeDefaultArgs = true ]] && peArgsStore "$PE_CONTEXT_PATH/context/default" "${args[@]}"
+        [[ $storeDefaultArgs = true ]] && peArgsStore "$PE_CONTEXT_PATH/context/default"      "${args[@]}"
 
         # execution mode (new, renew, set, unset, reset, choose, clear, save-as, run)
         local mode="none"
@@ -205,6 +205,9 @@ function main {
         # will be wrapped and parametrized
         local cmd=
 
+        # if command chain has any replacement
+        # this flag will be set to true to omit standard parametrization
+        local cmdHasReplacement=false
 
         # loop starting sequention of command chain building
         while [[ $# -gt 0 ]]; do
@@ -234,7 +237,9 @@ function main {
                 local exec="$2"
                 shift ; shift ; shift
                 [[ -f "$PE_CONTEXT_PATH/execs/$exec" ]] && rm "$PE_CONTEXT_PATH/execs/$exec"
-                for arg in "$@" ; do echo "$arg" >> "$PE_CONTEXT_PATH/execs/$exec" ; done
+                for arg in "$@" ; do
+                  echo "$arg" >> "$PE_CONTEXT_PATH/execs/$exec"
+                done
                 exit 0
               fi
               ;;
@@ -261,26 +266,24 @@ function main {
                     # SET mode
                     # parametrize two arguments and add them argument to cache
                     if [[ $mode = "set" ]]; then
-
-                      ! key=$(peArgsReplace   "$1" "${args[@]}" "${startArgs[@]}") && echo "$key" && exit 1
-                      ! value=$(peArgsReplace "$2" "${args[@]}" "${startArgs[@]}") && echo "$value" && exit 1
-
-                      eval "args=($(peArgsAddPair "$key" "$value" "${args[@]}"))"
-                      [[ $(peArgsIsPairKeyValue "$1" "$2") = "true" ]] && shift
+                      local keyValue=("$1" "$2")
+                      ! peArgsReplace keyValue "${args[@]}" "${startArgs[@]}" && echo "${keyValue[*]}" && exit 1
+                      peArgsAddPair "${keyValue[@]}" args
+                      [[ $(peArgsIsPairKeyValue "${keyValue[@]}") = "true" ]] && shift
                       shift
 
                     # UNSET mode
                     # remove argument from cache by key
                     elif [[ $mode = "unset" ]]; then
-                      eval "args=($(peArgsRemoveKey "$1" "${args[@]}"))"
+                      peArgsRemoveKey "$1" args
                       shift
 
                     # CHOOSE mode
                     # add to cache arguments selected from beginning argument set created before execution
                     elif [[ $mode = "choose" ]]; then
                       local chosen=()
-                      eval "chosen=($(peArgsChooseKey "$1" "${startArgs[@]}"))"
-                      args=("${args[@]}" "${chosen[@]}")
+                      peArgsChooseKey "$1" chosen "${startArgs[@]}"
+                      peArgsAddPair "${chosen[0]}" "${chosen[1]}" args
                       shift
 
                     # NEW mode
@@ -288,6 +291,7 @@ function main {
                     elif [[ $mode = "new" ]]; then
                       app=$1
                       mode="cmd"
+                      cmdHasReplacement=false
                       cmd=
                       shift
 
@@ -295,15 +299,21 @@ function main {
                     # clear command chang except for command name and switch mode to CMD
                     elif [[ $mode = "renew" ]]; then
                       mode="cmd"
+                      cmdHasReplacement=false
                       cmd=
 
                     # CMD mode
                     # wrap argument to be sure that every char will be treated as regular, parametrize it and add to command chain
                     elif [[ $mode = "cmd" ]]; then
-                      local value=$1
-                      value=$(peArgsWrap "$1")
-                      ! value=$(peArgsReplace "$value" "${args[@]}" "${startArgs[@]}") && echo "$value" && exit 1
-                      [[ -n $cmd ]] && cmd="$cmd $value" || cmd="$value"
+                      local cmdArgs=("$1")
+                      peArgsWrap cmdArgs "${cmdArgs[@]}"
+#                      echo "cmdArgs=(${cmdArgs[*]})"
+                      peArgsUnwrap cmdArgs "${cmdArgs[@]}"
+#                      echo "cmdArgs=(${cmdArgs[*]})"
+                      ! peArgsReplace cmdArgs "${args[@]}" "${startArgs[@]}" && echo "${cmdArgs[*]}" && exit 1
+#                      echo "cmdArgs=(${cmdArgs[*]})"
+                      [[ -n $cmd ]] && cmd="$cmd ${cmdArgs[*]}" || cmd="${cmdArgs[*]}"
+                      [[ "${cmdArgs[*]}" != "$1" ]] && cmdHasReplacement=true
                       shift
 
                     # RUN mode
@@ -320,12 +330,17 @@ function main {
 
               # after command chain building and before start new command chain build -----------------------------------------------
 
-              # double wrap argument to be sure that every char will be treated as regular and every argument will be passed (even empty string)
+              # wrap argument to be sure that every char will be treated as regular and every argument will be passed (even empty string)
               local packagedArgs=()
-              eval "packagedArgs=($(peArgsWrap $(peArgsWrap "${args[@]}")))"
+              if [[ $cmdHasReplacement = false ]] ; then
+                peArgsWrap packagedArgs "${args[@]}"
+#                echo "packagedArgs=(${packagedArgs[*]})"
+                peArgsUnwrap packagedArgs "${packagedArgs[@]}"
+#                echo "packagedArgs=(${packagedArgs[*]})"
+              fi
 
               # prepare command
-              local command="$app $(peArgsUnwrap "${packagedArgs[@]}") $cmd"
+              local command="$app ${packagedArgs[*]} $cmd"
 
               # print command for verbose or dev-mode
               [[ $mode = "cmd" ]] && [[ $verbose = true ]] && echo "CMD: $command"
@@ -344,12 +359,12 @@ function main {
 
         # add argument
         if [[ $setArgsEnabled = true ]]; then
-          eval "args=($(peArgsAddPair "$1" "$2" "${args[@]}"))"
+          peArgsAddPair "$1" "$2" args
           [[ $(peArgsIsPairKeyValue "$1" "$2") = "true" ]] && shift
 
         # remove argument
         else
-          eval "args=($(peArgsRemoveKey "$1" "${args[@]}"))"
+          peArgsRemoveKey "$1" args
 
         fi
 
@@ -363,7 +378,7 @@ function main {
   if [[ $execution = false ]]; then
 
     # print args to output
-    peArgsUnwrap "${args[@]}"
+    printf "%s" "${args[*]}"
 
     # store args
     [[ $storeArgs = true        ]] && peArgsStore "$PE_CONTEXT_PATH/context/$contextFile" "${args[@]}"

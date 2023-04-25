@@ -1,16 +1,16 @@
 
 # wrap each argument replacing each each sensitive char with escape
 
-function peArgsWrap {
+function peArgsWrapStatic {
   local target="$1" ; shift
 
   local __result=()
 
-  replacement="\\\""
+  replacement="'\''"
 
   for arg in "$@" ; do
-    arg="${arg//\"/$replacement}"
-    __result+=("\"$arg\"")
+    arg="${arg//"'"/$replacement}"
+    __result+=("'$arg'")
   done
 
   stdArraysCopy __result $target

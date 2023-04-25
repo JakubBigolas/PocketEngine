@@ -1,13 +1,18 @@
 function peArgsRemoveKey {
-    local newArgs=()
-    local argKey="$1"
-    shift
+    local argKey="$1" ; shift
+    local target="$1" ; shift
+
+    local __return=()
+    local targetCopy=()
+
+    # copy from source reference
+    stdArraysCopy $target targetCopy
 
     local key=
     local value=
     local type="key"
 
-    for it in "$@"
+    for it in "${targetCopy[@]}"
     do
 
       # for key remember and switch to value
@@ -24,12 +29,14 @@ function peArgsRemoveKey {
 
         # not left if keys are the same with or without '='
         if [[ ! "$key" == "$argKey" ]] && [[ ! "$keyWithoutValue" == "$argKey" ]]; then
-          peArgsWrap "$key"
-          peArgsWrap "$value"
+          __return+=("$key")
+          __return+=("$value")
         fi
 
       fi
 
     done
+
+    stdArraysCopy __return $target
 
 }

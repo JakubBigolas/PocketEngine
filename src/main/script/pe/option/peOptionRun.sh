@@ -1,13 +1,10 @@
 function peOptionRun {
 
-  local exec="$1"
-  shift
-  local verbose="$1"
-  shift
-  local devMode="$1"
-  shift
+  local exec="$1"     ; shift
+  local verbose="$1"  ; shift
+  local devMode="$1"  ; shift
   local args=("$@")
-  local execFile=
+  local execFile=()
   local verboseCmd=
   local devModeCmd=
 
@@ -20,16 +17,11 @@ function peOptionRun {
   # pass devMode argument
   [[ $devMode = true ]] && devModeCmd=" dev-mode"
 
-  # remove empty values
-  local execArgs=()
-  for arg in "${args[@]}" ; do [[ ! "$arg" = "[#]" ]] && execArgs=("${execArgs[@]}" "$arg") ; done
-
-  # double package to restore original shape and wrap with wildcards
-  eval "execArgs=($(peArgsWrap $(peArgsWrap "${execArgs[@]}")))"
-
-  eval commands=
-  eval "commands=($(peArgsWrap $(peArgsWrap "${execFile[@]}")))"
-
+  # wrap args and commands to static strings
+  local execArgs=("${args[@]}")
+  peArgsWrapStatic execArgs "${execArgs[@]}"
+  local commands=("${execFile[@]}")
+  peArgsWrapStatic commands "${commands[@]}"
 
   # execute as subcommand
   local command="pe$verboseCmd$devModeCmd clear ${execArgs[*]} - ${commands[*]}"
