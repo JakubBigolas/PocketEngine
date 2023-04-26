@@ -17,6 +17,7 @@ function peArgsRestore {
       type="key"
 
       # replace newline replacements with newline
+      key="${key//\\n/$'\n'}"
       value="${value//\\n/$'\n'}"
 
       peArgsSetPair "$key" "$value" $target

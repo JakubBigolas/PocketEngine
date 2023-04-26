@@ -4,12 +4,14 @@ function peOptionRun {
   local verbose="$1"  ; shift
   local devMode="$1"  ; shift
   local args=("$@")
+  local rawExecFile=()
   local execFile=()
   local verboseCmd=
   local devModeCmd=
 
   # read command from file
-  [[ -f "$PE_CONTEXT_PATH/execs/$exec" ]] && readarray -t execFile < "$PE_CONTEXT_PATH/execs/$exec"
+  [[ -f "$PE_CONTEXT_PATH/execs/$exec" ]] && readarray -t rawExecFile < "$PE_CONTEXT_PATH/execs/$exec"
+  for line in "${rawExecFile[@]}" ; do     execFile+=("${line//\\n/$'\n'}")     ; done
 
   # pass verbose argument
   [[ $verbose = true ]] && verboseCmd=" verbose"

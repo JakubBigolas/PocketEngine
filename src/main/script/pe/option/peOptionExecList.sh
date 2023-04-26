@@ -11,7 +11,7 @@ function peOptionExecList {
   for file in "${contextFiles[@]}"
   do
     if [[ -z "$search" ]] || [[ "$file" =~ $search ]]; then
-      echo -e "${C_GREEN}Context: ${C_WHITE}$file${C_RESET}"
+      echo -e "${C_GREEN}Execution: ${C_WHITE}$file${C_RESET}"
 
       # read raw args file
       readarray -t contextArgs < "$PE_CONTEXT_PATH/execs/$file"

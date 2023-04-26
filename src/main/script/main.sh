@@ -252,10 +252,7 @@ function main {
               if [[ $mode = "new" ]]; then
                 local exec="$2"
                 shift ; shift ; shift
-                [[ -f "$PE_CONTEXT_PATH/execs/$exec" ]] && rm "$PE_CONTEXT_PATH/execs/$exec"
-                for arg in "$@" ; do
-                  echo "$arg" >> "$PE_CONTEXT_PATH/execs/$exec"
-                done
+                peOptionSaveAs "$exec" "$@"
                 exit 0
               fi
               ;;
