@@ -3,16 +3,16 @@ function peArgsRemoveKey {
     local target="$1" ; shift
 
     local __return=()
-    local targetCopy=()
+    local __target=()
 
     # copy from source reference
-    stdArraysCopy $target targetCopy
+    stdArraysCopy $target __target
 
     local key=
     local value=
     local type="key"
 
-    for it in "${targetCopy[@]}"
+    for it in "${__target[@]}"
     do
 
       # for key remember and switch to value

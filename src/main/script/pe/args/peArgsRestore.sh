@@ -19,7 +19,7 @@ function peArgsRestore {
       # replace newline replacements with newline
       value="${value//\\n/$'\n'}"
 
-      peArgsAddPair "$key" "$value" $target
+      peArgsSetPair "$key" "$value" $target
 
     fi
   done

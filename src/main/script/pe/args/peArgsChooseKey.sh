@@ -24,8 +24,7 @@ function peArgsChooseKey {
 
         # not left if keys are the same with or without '='
         if [[ "$key" == "$argKey" ]] || [[ "$keyWithoutValue" = "$argKey" ]]; then
-          __return=("$key" "$value")
-          break
+          __return+=("$key" "$value")
         fi
 
       fi

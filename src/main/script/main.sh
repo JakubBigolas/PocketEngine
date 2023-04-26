@@ -11,6 +11,9 @@ function main {
   # enable setting arguments mode
   local setArgsEnabled=true
 
+  # enable adding arguments mode
+  local addArgsEnabled=true
+
   # if true then arguments will be stored just before first execution
   local storeArgs=false
 
@@ -38,6 +41,10 @@ function main {
 
   # ensure there context directory structure exists
   peSetUpContextDris
+
+  # load default behaviour config
+  [[ $PE_VERBOSE  = true ]] && verbose=true
+  [[ $PE_DEV_MODE = true ]] && devMode=true && verbose=true
 
   # read default variables first
   [[ -f "$PE_CONTEXT_PATH/context/default" ]] && peArgsRestore "$PE_CONTEXT_PATH/context/default" args
@@ -151,12 +158,21 @@ function main {
       # set flag remove arg key/value to true (only one after unset)
       unset)
         setArgsEnabled=false
+        addArgsEnabled=false
         shift
         ;;
 
       # set flag add arg key/value to true (only one after unset)
       set)
         setArgsEnabled=true
+        addArgsEnabled=false
+        shift
+        ;;
+
+      # set flag add arg key/value to true (only one after unset)
+      add)
+        setArgsEnabled=false
+        addArgsEnabled=true
         shift
         ;;
 
@@ -268,7 +284,7 @@ function main {
                     if [[ $mode = "set" ]]; then
                       local keyValue=("$1" "$2")
                       ! peArgsReplace keyValue "${args[@]}" "${startArgs[@]}" && echo "${keyValue[*]}" && exit 1
-                      peArgsAddPair "${keyValue[@]}" args
+                      peArgsSetPair "${keyValue[@]}" args
                       [[ $(peArgsIsPairKeyValue "${keyValue[@]}") = "true" ]] && shift
                       shift
 
@@ -283,7 +299,15 @@ function main {
                     elif [[ $mode = "choose" ]]; then
                       local chosen=()
                       peArgsChooseKey "$1" chosen "${startArgs[@]}"
-                      peArgsAddPair "${chosen[0]}" "${chosen[1]}" args
+                      if [[ "${#chosen[@]}" -gt 0 ]] ; then
+                        local key=
+                        local type="key"
+                        for item in "${chosen[@]}" ; do
+                          [[ "$type" = "key"   ]] && key="$item" && type="value" && continue
+                          peArgsAddPair "$key" "$item" args
+                          type="key"
+                        done
+                      fi
                       shift
 
                     # NEW mode
@@ -310,10 +334,11 @@ function main {
 #                      echo "cmdArgs=(${cmdArgs[*]})"
                       peArgsUnwrap cmdArgs "${cmdArgs[@]}"
 #                      echo "cmdArgs=(${cmdArgs[*]})"
+                      local cmdArgsBeforeReplacement=("${cmdArgs[*]}")
                       ! peArgsReplace cmdArgs "${args[@]}" "${startArgs[@]}" && echo "${cmdArgs[*]}" && exit 1
+                      [[ "${cmdArgs[*]}" != "${cmdArgsBeforeReplacement[*]}" ]] && cmdHasReplacement=true
 #                      echo "cmdArgs=(${cmdArgs[*]})"
                       [[ -n $cmd ]] && cmd="$cmd ${cmdArgs[*]}" || cmd="${cmdArgs[*]}"
-                      [[ "${cmdArgs[*]}" != "$1" ]] && cmdHasReplacement=true
                       shift
 
                     # RUN mode
@@ -357,8 +382,13 @@ function main {
 
       *)
 
-        # add argument
+        # set argument
         if [[ $setArgsEnabled = true ]]; then
+          peArgsSetPair "$1" "$2" args
+          [[ $(peArgsIsPairKeyValue "$1" "$2") = "true" ]] && shift
+
+        # add argument
+        elif [[ $addArgsEnabled = true ]]; then
           peArgsAddPair "$1" "$2" args
           [[ $(peArgsIsPairKeyValue "$1" "$2") = "true" ]] && shift
 
@@ -377,12 +407,14 @@ function main {
   # if there were no execution but there is still need to do something
   if [[ $execution = false ]]; then
 
-    # print args to output
-    printf "%s" "${args[*]}"
-
     # store args
     [[ $storeArgs = true        ]] && peArgsStore "$PE_CONTEXT_PATH/context/$contextFile" "${args[@]}"
     [[ $storeDefaultArgs = true ]] && peArgsStore "$PE_CONTEXT_PATH/context/default" "${args[@]}"
+
+    # print args to output
+    peArgsWrap args "${args[@]}"
+    peArgsUnwrap args "${args[@]}"
+    printf "%s" "${args[*]}"
 
   fi
 

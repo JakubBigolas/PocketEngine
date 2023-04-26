@@ -2,12 +2,12 @@ function peArgsReplace {
   local target="$1" ; shift
 
   local __return=()
-  local targetCopy=()
+  local __target=()
 
   # copy from source reference
-  stdArraysCopy $target targetCopy
+  stdArraysCopy $target __target
 
-  for input in "${targetCopy[@]}" ; do
+  for input in "${__target[@]}" ; do
 
     local result=
 
@@ -111,6 +111,7 @@ function peArgsReplace {
 
         local keyValuePair=()
         peArgsChooseKey "$expr" keyValuePair "$@"
+        [[ "${#keyValuePair[@]}" -gt 2 ]] && echo "ERROR: cannot replace ($originalExpr), found more than one matching key." && exit 1
 
         local key="${keyValuePair[0]}"
         local value="${keyValuePair[1]}"

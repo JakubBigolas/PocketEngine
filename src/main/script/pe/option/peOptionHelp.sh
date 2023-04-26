@@ -1,6 +1,6 @@
 function peOptionHelp {
   echo -e ""
-  echo -e "Usage: pe [options...] [arguments...] - [commands] [command parametrization...] -- [repeat last command with another command parametrization]"
+  echo -e "Usage: pe [options...] [arguments...] - [command] [command parametrization...] -- [repeat last command with another command parametrization]"
   echo -e ""
   echo -e "Main PocketEngine (\"pe\") purpose is to store and invoke multiple commands with configured arguments context as simple as it can be."
   echo -e ""
@@ -12,7 +12,7 @@ function peOptionHelp {
   pdToolHelpOptionPrint 'verbose'          'print each execution command before run'
   pdToolHelpOptionPrint 'dev-mode'         'development mode allow to see what engine will produce and run without real execution'
   pdToolHelpOptionPrint ''                 'enables verbose mode by default'
-  pdToolHelpOptionPrint 'context-path'     'return path to store directory'
+  pdToolHelpOptionPrint 'context-path'     'return path of store directory'
   pdToolHelpOptionPrint 'help'             'print this help info and exit'
   pdToolHelpOptionPrint 'version'          'print version info and exit'
   pdToolHelpOptionPrint '' ''
@@ -74,23 +74,24 @@ function peOptionHelp {
   echo -e "  KEY VALUE -KEY [#INTERNAL_KEY] #[VALUE_LOOKS_LIKE_KEY]"
   echo -e ""
   echo -e "Command parametrization:"
-  echo -e " It is possible to make command parametrization more complex."
-  echo -e " If there is need to put arguments in specific way this replacement form may be used:"
+  echo -e " By default all arguments from cache are placed just between command and it's parametrization."
+  echo -e " But it is possible to make command parametrization more complex."
+  echo -e " If there is need to put arguments in specific way, this replacement form may be used:"
   echo -e ""
   echo -e " Form \"Find value for key and replace it with or if there is no value then...\""
-  pdToolHelpOptionPrint "<<#?key#>>"         "...ommit"               26
-  pdToolHelpOptionPrint "<<#key#>>"          "...use empty string" 26
-  pdToolHelpOptionPrint "<<#key:?orElse#>>"  "...use "orElse""     26
-  pdToolHelpOptionPrint "<<#!key#>>"         "...finish with error"   26
+  pdToolHelpOptionPrint "<<#?key#>>"         "...ommit"                  26
+  pdToolHelpOptionPrint "<<#key#>>"          "...use empty string"       26
+  pdToolHelpOptionPrint "<<#key:?orElse#>>"  "...use "orElse""           26
+  pdToolHelpOptionPrint "<<#!key#>>"         "...finish with error"      26
   echo -e ""
   echo -e " Form \"Find key or if it has no presence then...\""
-  pdToolHelpOptionPrint "<<##?key##>>"         "...ommit"               26
-  pdToolHelpOptionPrint "<<##key##>>"          "...use empty string" 26
-  pdToolHelpOptionPrint "<<##key?:orElse##>>"  "...use "orElse""     26
-  pdToolHelpOptionPrint "<<##!key##>>"         "...finish with error"   26
+  pdToolHelpOptionPrint "<<##?key##>>"         "...ommit"                26
+  pdToolHelpOptionPrint "<<##key##>>"          "...use empty string"     26
+  pdToolHelpOptionPrint "<<##key?:orElse##>>"  "...use "orElse""         26
+  pdToolHelpOptionPrint "<<##!key##>>"         "...finish with error"    26
   echo -e ""
   echo -e " Form \"Find key and replace it with replacement or if there is no key..."
-  pdToolHelpOptionPrint "<<##?key|replacement##>>" "...ommit" 26
+  pdToolHelpOptionPrint "<<##?key|replacement##>>" "...ommit"            26
   pdToolHelpOptionPrint "<<##key|replacement##>>"  "...use empty string" 26
   echo -e ""
 }
