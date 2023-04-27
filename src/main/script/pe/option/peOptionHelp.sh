@@ -7,7 +7,10 @@ function peOptionHelp {
   echo -e "Options:"
   pdToolHelpOptionPrint '' ''
   pdToolHelpOptionPrint 'set'              'enable setting arguments cache sequention (enabled by default)'
-  pdToolHelpOptionPrint 'unset'            'start removing arguments cache sequention'
+  pdToolHelpOptionPrint ''                 'override previous key value if already exists in cach'
+  pdToolHelpOptionPrint 'add'              'enable adding arguments cache sequention (enabled by default)'
+  pdToolHelpOptionPrint ''                 'allow to add the same key in cache multiple times'
+  pdToolHelpOptionPrint 'unset'            'start removing arguments cache sequention by key name (all occurrences of key)'
   pdToolHelpOptionPrint 'clear'            'remove all arguments from cache'
   pdToolHelpOptionPrint 'verbose'          'print each execution command before run'
   pdToolHelpOptionPrint 'dev-mode'         'development mode allow to see what engine will produce and run without real execution'
@@ -45,6 +48,8 @@ function peOptionHelp {
   pdToolHelpOptionPrint '' ''
   pdToolHelpOptionPrint '-'                'start new command execution'
   pdToolHelpOptionPrint '--'               'start new execution with last command name'
+  pdToolHelpOptionPrint '---'              'working like sequention " - run * "'
+  pdToolHelpOptionPrint '- set'            'allow to set new arguments to cache before next execution'
   pdToolHelpOptionPrint '- set'            'allow to add new arguments to cache before next execution'
   pdToolHelpOptionPrint '- unset'          'allow to remove arguments from cache before next execution'
   pdToolHelpOptionPrint '- reset'          'restore arguments cache to state before start fist execution'
@@ -93,5 +98,13 @@ function peOptionHelp {
   echo -e " Form \"Find key and replace it with replacement or if there is no key..."
   pdToolHelpOptionPrint "<<##?key|replacement##>>" "...ommit"            26
   pdToolHelpOptionPrint "<<##key|replacement##>>"  "...use empty string" 26
+  echo -e ""
+  echo -e " Form \"Find key and repeat replacement for each occurance of key:"
+  pdToolHelpOptionPrint "<<###each:key###>> ... repeatable content ... <<###each!###>>"
+  echo -e "  While each form is processing only one occurrence of key is available in cache and some additional parameters:"
+  pdToolHelpOptionPrint " --each-size"  "count of all occurrences of key" 26
+  pdToolHelpOptionPrint " --each-index" "current occurrence of key" 26
+  pdToolHelpOptionPrint " --each-first" "appears only for first occurrence with single space value" 26
+  pdToolHelpOptionPrint " --each-last"  "appears only for last occurrence with single space value" 26
   echo -e ""
 }

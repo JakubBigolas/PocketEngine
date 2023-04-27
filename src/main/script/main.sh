@@ -197,7 +197,7 @@ function main {
 
 
       # --------------------------------------------------------------------------------------------------------------------------------
-      -) # start sub execution process
+      -|---) # start sub execution process
 
         # set flag indicates that execution has been started
         execution=true
@@ -232,6 +232,9 @@ function main {
             # switch mode new -> set
             set)    [[ $mode = "new" ]] && mode="set"    &&                             shift ;;
 
+            # switch mode new -> add
+            add)    [[ $mode = "new" ]] && mode="add"    &&                             shift ;;
+
             # switch mode new -> unset
             unset)  [[ $mode = "new" ]] && mode="unset"  &&                             shift ;;
 
@@ -261,6 +264,8 @@ function main {
             -)    mode="new"   ; shift ;;
             # switch any mode -> renew
             --)   mode="renew" ; shift ;;
+            # switch any mode -> run
+            ---)  mode="run"   ; shift ;;
 
             # building command chain util "-" or "--" not appears ---------------------------------------------
             *)
@@ -280,8 +285,17 @@ function main {
                     # parametrize two arguments and add them argument to cache
                     if [[ $mode = "set" ]]; then
                       local keyValue=("$1" "$2")
-                      ! peArgsReplace keyValue "${args[@]}" "${startArgs[@]}" && echo "${keyValue[*]}" && exit 1
+                      ! peArgsReplace keyValue "${args[@]}" && echo "${keyValue[*]}" && exit 1
                       peArgsSetPair "${keyValue[@]}" args
+                      [[ $(peArgsIsPairKeyValue "${keyValue[@]}") = "true" ]] && shift
+                      shift
+
+                    # ADD mode
+                    # parametrize two arguments and add them argument to cache
+                    elif [[ $mode = "add" ]]; then
+                      local keyValue=("$1" "$2")
+                      ! peArgsReplace keyValue "${args[@]}" && echo "${keyValue[*]}" && exit 1
+                      peArgsAddPair "${keyValue[@]}" args
                       [[ $(peArgsIsPairKeyValue "${keyValue[@]}") = "true" ]] && shift
                       shift
 
@@ -332,7 +346,7 @@ function main {
                       peArgsUnwrap cmdArgs "${cmdArgs[@]}"
 #                      echo "cmdArgs=(${cmdArgs[*]})"
                       local cmdArgsBeforeReplacement=("${cmdArgs[*]}")
-                      ! peArgsReplace cmdArgs "${args[@]}" "${startArgs[@]}" && echo "${cmdArgs[*]}" && exit 1
+                      ! peArgsReplace cmdArgs "${args[@]}" && echo "${cmdArgs[*]}" && exit 1
                       [[ "${cmdArgs[*]}" != "${cmdArgsBeforeReplacement[*]}" ]] && cmdHasReplacement=true
 #                      echo "cmdArgs=(${cmdArgs[*]})"
                       [[ -n $cmd ]] && cmd="$cmd ${cmdArgs[*]}" || cmd="${cmdArgs[*]}"

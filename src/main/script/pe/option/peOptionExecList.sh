@@ -19,13 +19,25 @@ function peOptionExecList {
       echo
       printf "${C_WHITE} >"
       local format="${C_I_BLUE}"
+      local isApp=true
       # print in pretty format
       for it in "${contextArgs[@]}"
       do
 
-          [[ "$it" = "-"    ]] && echo && printf "${C_WHITE} >"  && format="${C_I_BLUE}"
+          [[ "$it" = "-"    ]] && echo && printf "${C_WHITE} >"  && format="${C_I_BLUE}" && isApp=true
           [[ "$it" = "--"   ]] && echo && printf "${C_WHITE} >>"
-          [[ ! "$it" = "-"  ]] && [[ ! "$it" = "--" ]] && printf "${format} %s" "$it" && format="${C_RESET}"
+
+          if [[ ! "$it" = "-"  ]] && [[ ! "$it" = "--" ]] ; then
+            if [[ $isApp = false ]] ; then
+              local itWrapped=("$it")
+              peArgsWrap itWrapped "$it"
+              it="${itWrapped[*]}"
+            else
+              isApp=false
+            fi
+            printf "${format} %s" "$it"
+            format="${C_RESET}"
+          fi
 
       done
       echo

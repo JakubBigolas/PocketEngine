@@ -18,6 +18,8 @@ function peOptionContextList {
       # read raw args file
       readarray -t contextArgs < "$PE_CONTEXT_PATH/context/$file"
 
+      peArgsWrap contextArgs "${contextArgs[@]}"
+
       echo
       local type="key"
       for it in "${contextArgs[@]}"
