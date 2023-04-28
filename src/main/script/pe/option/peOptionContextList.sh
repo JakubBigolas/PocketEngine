@@ -15,6 +15,7 @@ function peOptionContextList {
     if [[ -z "$search" ]] || [[ "$file" =~ $search ]]; then
       echo -e "${C_GREEN}Context: ${C_WHITE}$file${C_RESET}"
 
+      local contextArgs=()
       # read raw args file
       readarray -t contextArgs < "$PE_CONTEXT_PATH/context/$file"
 

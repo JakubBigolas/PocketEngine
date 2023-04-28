@@ -13,6 +13,7 @@ function peOptionExecList {
     if [[ -z "$search" ]] || [[ "$file" =~ $search ]]; then
       echo -e "${C_GREEN}Execution: ${C_WHITE}$file${C_RESET}"
 
+      local contextArgs=()
       # read raw args file
       readarray -t contextArgs < "$PE_CONTEXT_PATH/execs/$file"
 
@@ -20,6 +21,7 @@ function peOptionExecList {
       printf "${C_WHITE} >"
       local format="${C_I_BLUE}"
       local isApp=true
+      local line=""
       # print in pretty format
       for it in "${contextArgs[@]}"
       do
@@ -32,6 +34,7 @@ function peOptionExecList {
               local itWrapped=("$it")
               peArgsWrap itWrapped "$it"
               it="${itWrapped[*]}"
+              line+="$it"
             else
               isApp=false
             fi
@@ -42,6 +45,7 @@ function peOptionExecList {
       done
       echo
       echo
+      [[ -n "$line" ]] && peArgsPrintReplacementsInfo "$line"
 
     fi
   done

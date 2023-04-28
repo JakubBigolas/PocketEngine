@@ -424,7 +424,7 @@ function main {
 
     # print args to output
     peArgsWrap args "${args[@]}"
-    peArgsUnwrap args "${args[@]}"
+#    peArgsUnwrap args "${args[@]}"
     printf "%s" "${args[*]}"
 
   fi
