@@ -5,4 +5,4 @@ PE_CONTEXT_PATH="C:\Users\jakub.bigolas\OneDrive\configs\pe"
 PE_DEV_MODE=false
 
 # use verbose option by default
-PE_VERBOSE=false
+PE_VERBOSE=true

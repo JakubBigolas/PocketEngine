@@ -9,7 +9,7 @@ function main {
   local startArgs=()
 
   # enable setting arguments mode
-  local setArgsEnabled=true
+  local setArgsEnabled=false
 
   # enable adding arguments mode
   local addArgsEnabled=true
@@ -273,7 +273,7 @@ function main {
                 case $1 in
 
                   # break current command chain building, return to parent loop starting new command chain building
-                  -|--)
+                  -|--|---)
                     break
                     ;;
 

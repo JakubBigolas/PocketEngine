@@ -191,8 +191,8 @@ function peArgsReplace {
                 [[ $isRequired = true ]] && echo "ERROR: Required expression: key not found ($originalExpr)" && exit 1
                 # or has empty replacement - replace it
                 [[ $isEmptyReplacement = true ]] && key="$emptyReplacement"
-                # or is not conditional and has replacement = replace it
-                [[ $isReplacement = true ]] && key="$replacement"
+                # or is not conditional and has replacement use empty string
+                [[ $isReplacement = true ]] && key=""
               fi
             else
               [[ $isReplacement = true ]] && key="$replacement"

@@ -6,7 +6,7 @@ function peOptionHelp {
   echo -e ""
   echo -e "Options:"
   pdToolHelpOptionPrint '' ''
-  pdToolHelpOptionPrint 'set'              'enable setting arguments cache sequention (enabled by default)'
+  pdToolHelpOptionPrint 'set'              'enable setting arguments cache sequention'
   pdToolHelpOptionPrint ''                 'override previous key value if already exists in cach'
   pdToolHelpOptionPrint 'add'              'enable adding arguments cache sequention (enabled by default)'
   pdToolHelpOptionPrint ''                 'allow to add the same key in cache multiple times'

@@ -1,6 +1,9 @@
 peArgsPrintReplacementsInfo() {
   local source="$1"
 
+  local keysExpressions=()
+  local valuesExpressions=()
+  local eachExpressions=()
   readarray -t keysExpressions   < <(echo "$(echo "$source" | grep --only-matching -P "<<##[^#].*?#>>")")
   readarray -t valuesExpressions < <(echo "$(echo "$source" | grep --only-matching -P "<<#[^#].*?#>>")")
   readarray -t eachExpressions   < <(echo "$(echo "$source" | grep --only-matching -P "<<###each:.*?#>>")")

@@ -13,6 +13,21 @@ function peOptionExecList {
     if [[ -z "$search" ]] || [[ "$file" =~ $search ]]; then
       echo -e "${C_GREEN}Execution: ${C_WHITE}$file${C_RESET}"
 
+      local execDocFile="$PE_CONTEXT_PATH/execs-docs/$file"
+      if [[ -f "$execDocFile" ]] ; then
+
+        local execDocFileLines=()
+        readarray -t execDocFileLines < <(   cat "$execDocFile"   )
+
+        echo "#"
+        local line=
+        for line in "${execDocFileLines[@]}" ; do
+          printf "#   ${C_I_YELLOW}%s${C_RESET}\n" "$line"
+        done
+        echo "#"
+
+      fi
+
       local contextArgs=()
       # read raw args file
       readarray -t contextArgs < "$PE_CONTEXT_PATH/execs/$file"
