@@ -1,7 +1,3 @@
-
-Engine has been made to make bash script easier.
-
-
 To compile engine bin resources in one engine.sh file use script like this:
 
 # go to engine direcotry

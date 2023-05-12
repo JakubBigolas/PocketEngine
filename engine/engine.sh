@@ -505,6 +505,9 @@ function __testExecution {
 function printHelp {
   echo "Usage: "
   echo ""
+  echo "Engine is simple tool to create and manage bash script projects."
+  echo "Allows to split and test code in very many files."
+  echo ""
   echo " $: engine [args...] [option]"
   echo ""
   echo " Arguments: "
