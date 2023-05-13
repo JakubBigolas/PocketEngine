@@ -20,7 +20,7 @@ function peArgsRestore {
       key="${key//\\n/$'\n'}"
       value="${value//\\n/$'\n'}"
 
-      peArgsSetPair "$key" "$value" $target
+      peArgsAddPair "$key" "$value" $target
 
     fi
   done
