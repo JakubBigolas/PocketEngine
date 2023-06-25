@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# import and start engine
+. "$POCKET_ENGINE_HOME/engine/engine-embed.sh"
+engineCreateContext "$POCKET_ENGINE_HOME"
+engineStart         "$POCKET_ENGINE_HOME" "$@"

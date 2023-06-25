@@ -1,0 +1,2 @@
+class PeError(RuntimeError):
+    pass
