@@ -1,7 +1,7 @@
 import sys
 import config
 from modules.pe.app import App
-from modules.pe.domain.error import PeError
+from modules.pe.error import PeError
 
 try:
 

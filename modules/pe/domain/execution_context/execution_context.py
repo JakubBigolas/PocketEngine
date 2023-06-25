@@ -1,29 +1,31 @@
-from modules.pe.domain.app import AppContext
-from modules.pe.domain.execution_context_data import ExecutionContextData
+from modules.pe.domain.app_context import AppContext
+from modules.pe.domain.execution_context.data import ExecutionContextData
 
 from modules.pe.domain.execution_context.execution_context_helper import ExecutionContextHelper
+from modules.pe.domain.execution_context.parser import ExecutionContextParser
 
 
 class ExecutionContext:
 
-    def __init__(self, verbose: bool, dev_mode: bool):
-        self.__data = ExecutionContextData(verbose, dev_mode)
+    def __init__(self, app_context: AppContext):
+        self.__app_context = app_context
         self.__helper = ExecutionContextHelper()
 
-    @property
-    def data(self)        -> ExecutionContextData : return self.__data
+
+
+    def print_args_if_no_execution(self, data: ExecutionContextData):
+        self.__helper.print_args_if_no_execution(data)
 
 
 
-    def print_args_if_no_execution(self):
-        self.__helper.print_args_if_no_execution(self.__data)
+    def store_args_if_requested(self, data: ExecutionContextData):
+        self.__helper.store_args_if_requested(self.__app_context, data)
 
 
 
-    def store_args_if_requested(self, app_context: AppContext):
-        self.__helper.store_args_if_requested(app_context, self.__data)
+    def store_exec_if_requested(self, data: ExecutionContextData):
+        self.__helper.store_exec_if_requested(self.__app_context, data)
 
 
-
-    def store_exec_if_requested(self, app_context: AppContext):
-        self.__helper.store_exec_if_requested(app_context, self.__data)
+    def parser(self):
+        return ExecutionContextParser(self.__app_context)
