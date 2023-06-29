@@ -42,7 +42,7 @@ class SelectionReader:
             item.count          = context.read_begin("[@]")
             item.wrapper        = "'" if context.read_begin("['*']") else ( "\"" if context.read_begin("[\"*\"]") else None )
             item.concat         = item.wrapper is not None or context.read_begin("[*]")
-            item.item           = self.read_selection_key_array_index(context)
+            item.item           = self.read_selection_key_array_index(item, context)
             item.replacement    = self.read_sub_selection(context, "->", [":?", "#", ">"], item)  # self.read_selection_replacement(context)
             item.or_else        = self.read_sub_selection(context, ":?", ["#", ">"], item)  # self.read_selection_or_else(context)
 
@@ -68,7 +68,7 @@ class SelectionReader:
 
             if      item.count            : item.key = str(len(values))
             elif    item.concat           : item.key = self.concat_args_values(values, item.wrapper)
-            elif    item.item is not None : item.key = values[item.item] if item.item < len(values) else None
+            elif    item.item is not None : item.key = self.wrap_arg(values[item.item], item.wrapper) if item.item < len(values) else None
 
             if      item.key is not None  : context.result += item.key if item.replacement is None else item.replacement
 
@@ -101,12 +101,17 @@ class SelectionReader:
 
 
 
-    def read_selection_key_array_index(self, context: ParametrizationContextData):
+    def read_selection_key_array_index(self, item: ParametrizationContextItemSelection, context: ParametrizationContextData):
         index = None
         if context.read_begin("["):
 
+            item.wrapper = "'" if context.read_begin("'") else ( "\"" if context.read_begin("\"") else None )
+
             while context.starts_with(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]):
                 index = ((0 if index is None else index) * 10) + int(context.read_first(1))
+
+            if item.wrapper is not None and not context.read_begin(item.wrapper):
+                raise PeError(f"Incorrect wrapping close, expected char: {item.wrapper} obtained char: {None if len(context.input) < 1 else context.input[0]}")
 
             if not context.read_begin("]"):
                 raise PeError("Incorrect item selection!")
