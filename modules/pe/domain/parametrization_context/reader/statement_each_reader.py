@@ -1,9 +1,8 @@
 from copy import deepcopy
-
-from modules.pe.domain.parametrization_context.data.parametrization_context_data import ParametrizationContextData
-from modules.pe.domain.parametrization_context.data.parametrization_context_item_statement_each import ParametrizationContextItemStatementEach
 from modules.pe.error import PeError
-from modules.pe.utils.color_utils import ColorUtils
+
+from ..data.parametrization_context_data import ParametrizationContextData
+from ..data.parametrization_context_item_statement_each import ParametrizationContextItemStatementEach
 
 
 class StatementEachReader:

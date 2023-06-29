@@ -1,8 +1,8 @@
 from copy import deepcopy
 from modules.pe.error import PeError
-from modules.pe.domain.execution_context.data.execution_context_config import ExecutionContextConfig
 
-from modules.pe.domain.execution_context.data.execution_context_data_helper import ExecutionContextDataHelper
+from .execution_context_config import ExecutionContextConfig
+from .execution_context_data_helper import ExecutionContextDataHelper
 
 
 class ExecutionContextData:

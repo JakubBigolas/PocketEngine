@@ -1,10 +1,11 @@
 from copy import deepcopy
 
-from modules.pe.domain.app_context                                                          import AppContext
+from modules.pe.domain.app_context import AppContext
 from modules.pe.error import PeError
-from modules.pe.domain.execution_context.data import ExecutionContextData
-from modules.pe.domain.execution_context.parser.args.args_resolver import ArgsResolver
-from modules.pe.domain.execution_context.parser.args.handler import ArgsHandlerAbstract
+
+from ..data.execution_context_data import ExecutionContextData
+from .args.args_resolver import ArgsResolver
+from .args.handler.args_handler_abstract import ArgsHandlerAbstract
 
 
 class ExecutionContextParser:

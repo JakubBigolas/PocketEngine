@@ -1,8 +1,8 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_chain.data.execution_chain_data import ExecutionChainData
-from modules.pe.domain.execution_chain.runner.runner.handler import RunnerHandlerAbstract
-from modules.pe.domain.execution_chain.runner.runner.handler.cmd_handler import CmdHandler
-from modules.pe.domain.execution_chain.runner.runner.handler.stored_cmd_handler import StoredCmdHandler
+from ...data.execution_chain_data import ExecutionChainData
+from .handler.runner_handler_abstract import RunnerHandlerAbstract
+from .handler.cmd_handler import CmdHandler
+from .handler.stored_cmd_handler import StoredCmdHandler
 
 
 class RunnerResolver:

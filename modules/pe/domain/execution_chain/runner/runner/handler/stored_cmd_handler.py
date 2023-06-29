@@ -2,11 +2,13 @@ import uuid
 from sys import stdout
 
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_chain.data.execution_chain_data import ExecutionChainData
-from modules.pe.domain.execution_chain.data.execution_chain_data_stored_cmd import ExecutionChainDataStoredCmd
-from modules.pe.domain.execution_chain.runner.runner.handler import RunnerHandlerAbstract
-from modules.pe.domain.execution_context.data import ExecutionContextData
-from modules.pe.domain.execution_context.data.execution_context_config import ExecutionContextConfig
+from modules.pe.utils import ColorUtils
+from modules.pe.domain.execution_context import ExecutionContextData
+from modules.pe.domain.execution_context import ExecutionContextConfig
+from ....data.execution_chain_data import ExecutionChainData
+from ....data.execution_chain_data_stored_cmd import ExecutionChainDataStoredCmd
+from .runner_handler_abstract import RunnerHandlerAbstract
+
 
 class StoredCmdHandler(RunnerHandlerAbstract):
 
@@ -29,10 +31,19 @@ class StoredCmdHandler(RunnerHandlerAbstract):
 
     def print_start_sub_execution(self, config: ExecutionContextConfig, args: list, exec: list, chain_data: ExecutionChainDataStoredCmd) -> uuid:
         exec_uuid = uuid.uuid4()
+
+        args_line = ""
+        for arg in args         : args_line += arg + " "
+        if len(args_line) > 0   : args_line = args_line[:-1]
+
+        exec_line = ""
+        for ex in exec          : exec_line += ex + " "
+        if len(exec_line) > 0   : exec_line = exec_line[:-1]
+
         if config.is_verbose or config.is_dev_mode:
-            print("START STORED EXECUTION : {} ({})".format(chain_data.execution_name, exec_uuid))
-            print("EXECUTION CHAIN        : {}".format(exec))
-            print("WITH ARGS              : {}".format(args))
+            print(f"START STORED EXECUTION : {chain_data.execution_name} {ColorUtils.C_BLUE}{exec_uuid}{ColorUtils.C_RESET}")
+            print(f"EXECUTION CHAIN        : {exec_line}")
+            print(f"WITH ARGS              : {args_line}")
             stdout.flush()
         return exec_uuid
 
@@ -40,7 +51,7 @@ class StoredCmdHandler(RunnerHandlerAbstract):
 
     def print_end_sub_execution(self, config: ExecutionContextConfig, exec_uuid: uuid, chain_data: ExecutionChainDataStoredCmd):
         if config.is_verbose or config.is_dev_mode:
-            print("END STORED EXECUTION   : {} ({})".format(chain_data.execution_name, exec_uuid))
+            print(f"END STORED EXECUTION   : {chain_data.execution_name} {ColorUtils.C_BLUE}{exec_uuid}{ColorUtils.C_RESET}")
             stdout.flush()
 
 

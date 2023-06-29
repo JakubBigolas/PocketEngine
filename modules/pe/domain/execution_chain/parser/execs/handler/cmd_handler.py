@@ -1,7 +1,7 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_chain.data.execution_chain_data import ExecutionChainData
-from modules.pe.domain.execution_chain.data.execution_chain_data_cmd import ExecutionChainDataCmd
-from modules.pe.domain.execution_chain.parser.execs.handler.exec_handler_abstract import ExecHandlerAbstract
+from ....data.execution_chain_data import ExecutionChainData
+from ....data.execution_chain_data_cmd import ExecutionChainDataCmd
+from .exec_handler_abstract import ExecHandlerAbstract
 
 
 class CmdHandler(ExecHandlerAbstract):

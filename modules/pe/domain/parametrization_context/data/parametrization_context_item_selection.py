@@ -1,4 +1,4 @@
-from modules.pe.domain.parametrization_context.data.parametrization_context_item import ParametrizationContextItem
+from .parametrization_context_item import ParametrizationContextItem
 
 
 class ParametrizationContextItemSelection(ParametrizationContextItem):
@@ -8,6 +8,7 @@ class ParametrizationContextItemSelection(ParametrizationContextItem):
         self.key: str           = None
         self.count: bool        = None
         self.concat: bool       = None
+        self.wrapper: str       = None
         self.item: int          = None
         self.replacement: str   = None
         self.or_else: str       = None

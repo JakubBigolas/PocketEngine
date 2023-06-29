@@ -1,7 +1,7 @@
 from modules.pe.domain.app_context import AppContext
 from modules.pe.error import PeError
-from modules.pe.domain.execution_context.parser.args.handler import ArgsHandlerAbstract
-from modules.pe.domain.execution_context.data import ExecutionContextData
+from .args_handler_abstract import ArgsHandlerAbstract
+from ....data.execution_context_data import ExecutionContextData
 
 
 class OptionContextRmHandler(ArgsHandlerAbstract):

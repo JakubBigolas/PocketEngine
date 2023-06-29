@@ -1,6 +1,6 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_chain.parser.execution_chain_parser import ExecutionChainParser
-from modules.pe.domain.execution_chain.runner import ExecutionChainRunner
+from .parser.execution_chain_parser import ExecutionChainParser
+from .runner.execution_chain_runner import ExecutionChainRunner
 
 
 class ExecutionChain:

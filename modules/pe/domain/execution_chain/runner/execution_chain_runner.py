@@ -1,10 +1,10 @@
 from copy import deepcopy
 
-from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_chain.data.execution_chain_data import ExecutionChainData
-from modules.pe.domain.execution_chain.runner.runner.runner_resolver import RunnerResolver
-from modules.pe.domain.execution_context.data import ExecutionContextData
 from modules.pe.error import PeError
+from modules.pe.domain.app_context import AppContext
+from ..data.execution_chain_data import ExecutionChainData
+from .runner.runner_resolver import RunnerResolver
+from modules.pe.domain.execution_context import ExecutionContextData
 
 
 class ExecutionChainRunner:

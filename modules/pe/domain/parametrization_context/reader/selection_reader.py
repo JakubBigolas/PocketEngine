@@ -1,7 +1,8 @@
-from modules.pe.domain.parametrization_context.data.parametrization_context_data import ParametrizationContextData
-from modules.pe.domain.parametrization_context.data.parametrization_context_item_selection import ParametrizationContextItemSelection
-from modules.pe.domain.parametrization_context.data.parametrization_context_item_selection_all import ParametrizationContextItemSelectionAll
 from modules.pe.error import PeError
+
+from ..data.parametrization_context_data import ParametrizationContextData
+from ..data.parametrization_context_item_selection import ParametrizationContextItemSelection
+from ..data.parametrization_context_item_selection_all import ParametrizationContextItemSelectionAll
 
 
 class SelectionReader:
@@ -23,11 +24,13 @@ class SelectionReader:
 
 
     def read_selection(self, context: ParametrizationContextData) -> bool:
-        if context.read_begin("<<#@"):
+        wrapper = "'" if context.read_begin("<<#'@'") else ( "\"" if context.read_begin("<<#\"@\"") else None )
+
+        if wrapper is not None or context.read_begin("<<#@"):
             context.add_item(ParametrizationContextItemSelectionAll())
 
             self.read_selection_done(context)
-            context.result += self.concat_args(context.args)
+            context.result += self.concat_args(context.args, wrapper)
             return True
 
         if context.read_begin("<<#"):
@@ -37,7 +40,8 @@ class SelectionReader:
             item.required       = context.read_begin("!")
             item.key            = self.read_key(context)
             item.count          = context.read_begin("[@]")
-            item.concat         = context.read_begin("[*]")
+            item.wrapper        = "'" if context.read_begin("['*']") else ( "\"" if context.read_begin("[\"*\"]") else None )
+            item.concat         = item.wrapper is not None or context.read_begin("[*]")
             item.item           = self.read_selection_key_array_index(context)
             item.replacement    = self.read_sub_selection(context, "->", [":?", "#", ">"], item)  # self.read_selection_replacement(context)
             item.or_else        = self.read_sub_selection(context, ":?", ["#", ">"], item)  # self.read_selection_or_else(context)
@@ -63,7 +67,7 @@ class SelectionReader:
             values = context.args[item.key]
 
             if      item.count            : item.key = str(len(values))
-            elif    item.concat           : item.key = self.concat_args_values(values)
+            elif    item.concat           : item.key = self.concat_args_values(values, item.wrapper)
             elif    item.item is not None : item.key = values[item.item] if item.item < len(values) else None
 
             if      item.key is not None  : context.result += item.key if item.replacement is None else item.replacement
@@ -142,26 +146,44 @@ class SelectionReader:
 
 
 
-    def concat_args(self, args):
+    def concat_args(self, args, wrapper:str = None):
         result = ""
 
         for key in args:
             values = args[key]
             if values and len(values) > 0:
                 for value in values:
-                    result += "{} {} ".format(key, value)
+                    result += "{} {} ".format(self.wrap_arg(key, wrapper), self.wrap_arg(value, wrapper))
             else:
-                result += "{} ".format(key)
+                result += "{} ".format(self.wrap_arg(key, wrapper))
 
         return result if len(result) == 0 else result[:-1]
 
 
 
-    def concat_args_values(self, values):
+    def wrap_arg(self, arg: str, wrapper: str):
+        if wrapper is not None:
+            arg = "" if arg is None else arg
+
+            if wrapper == "'":
+                arg = arg.replace("'", "''")
+                pass
+
+            elif wrapper == "\"":
+                arg = arg.replace("\"", "\\\"")
+                pass
+
+            arg = wrapper + arg + wrapper
+
+        return arg
+
+
+
+    def concat_args_values(self, values, wrapper: str):
         result = ""
 
         if values and len(values) > 0:
             for value in values:
-                result += "{} ".format(value)
+                result += "{} ".format(self.wrap_arg(value, wrapper))
 
         return result if len(result) == 0 else result[:-1]

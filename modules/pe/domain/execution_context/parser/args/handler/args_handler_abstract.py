@@ -1,5 +1,5 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_context.data import ExecutionContextData
+from ....data.execution_context_data import ExecutionContextData
 
 
 class ArgsHandlerAbstract:

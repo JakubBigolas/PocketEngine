@@ -1,5 +1,5 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_chain.data.execution_chain_data import ExecutionChainData
+from ....data.execution_chain_data import ExecutionChainData
 
 
 class ExecHandlerAbstract:

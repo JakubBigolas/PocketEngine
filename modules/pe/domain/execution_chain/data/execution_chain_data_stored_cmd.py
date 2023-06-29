@@ -1,4 +1,4 @@
-from modules.pe.domain.execution_chain.data.execution_chain_data import ExecutionChainData
+from .execution_chain_data import ExecutionChainData
 
 
 class ExecutionChainDataStoredCmd(ExecutionChainData):

@@ -1,8 +1,8 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_context.data import ExecutionContextData
 
-from modules.pe.domain.execution_context.execution_context_helper import ExecutionContextHelper
-from modules.pe.domain.execution_context.parser import ExecutionContextParser
+from .data.execution_context_data import ExecutionContextData
+from .execution_context_helper import ExecutionContextHelper
+from .parser.execution_context_parser import ExecutionContextParser
 
 
 class ExecutionContext:

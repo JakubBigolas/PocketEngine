@@ -1,5 +1,5 @@
-from modules.pe.domain.parametrization_context.data.parametrization_context_data import ParametrizationContextData
-from modules.pe.domain.parametrization_context.reader.statement_each_reader import StatementEachReader
+from ..data.parametrization_context_data import ParametrizationContextData
+from .statement_each_reader import StatementEachReader
 from modules.pe.error import PeError
 
 

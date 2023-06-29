@@ -1,16 +1,16 @@
 import io
-
-from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_context.parser.args.handler import ArgsHandlerAbstract
-from modules.pe.domain.execution_context.data import ExecutionContextData
 import re
 
-from modules.pe.domain.parametrization_context.data.parametrization_context_item_selection import ParametrizationContextItemSelection
-from modules.pe.domain.parametrization_context.data.parametrization_context_item_selection_all import ParametrizationContextItemSelectionAll
-from modules.pe.domain.parametrization_context.data.parametrization_context_item_statement_each import ParametrizationContextItemStatementEach
-from modules.pe.domain.parametrization_context.parametrization_context import ParametrizationContext
+from modules.pe.domain.app_context import AppContext
 from modules.pe.utils.arg_utils import ArgUtils
 from modules.pe.utils.color_utils import ColorUtils
+from modules.pe.domain.parametrization_context import ParametrizationContextItemSelection,\
+    ParametrizationContextItemSelectionAll,\
+    ParametrizationContextItemStatementEach,\
+    ParametrizationContext
+
+from .args_handler_abstract import ArgsHandlerAbstract
+from ....data.execution_context_data import ExecutionContextData
 
 
 class OptionExecListHandler(ArgsHandlerAbstract):

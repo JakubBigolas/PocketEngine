@@ -1,6 +1,6 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_context.data import ExecutionContextData
-from modules.pe.domain.execution_context.parser.args.handler import ArgsHandlerAbstract
+from ....data.execution_context_data import ExecutionContextData
+from .args_handler_abstract import ArgsHandlerAbstract
 
 class ArgsContextHandlerAbstract(ArgsHandlerAbstract):
 

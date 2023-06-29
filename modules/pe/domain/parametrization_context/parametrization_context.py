@@ -1,8 +1,9 @@
-from modules.pe.domain.parametrization_context.data.parametrization_context_data import ParametrizationContextData
-from modules.pe.domain.parametrization_context.data.parametrization_context_item_statement_each import ParametrizationContextItemStatementEach
-from modules.pe.domain.parametrization_context.reader.selection_reader import SelectionReader
-from modules.pe.domain.parametrization_context.reader.statement_reader import StatementReader
 from modules.pe.error import PeError
+
+from .data.parametrization_context_data import ParametrizationContextData
+from .data.parametrization_context_item_statement_each import ParametrizationContextItemStatementEach
+from .reader.selection_reader import SelectionReader
+from .reader.statement_reader import StatementReader
 
 
 class ParametrizationContext:
@@ -27,16 +28,16 @@ class ParametrizationContext:
                             context.handle_error(e, execution, context.input)
 
 
-    def to_parametrized_string(self, strings: list, args: dict, wrap = True) -> str:
+    def to_parametrized_string(self, strings: list, args: dict, wrap = False) -> str:
         result = ""
 
         for param in strings:
             result += self.parametrize_string(param, args, wrap) + " "
 
         limit = 100
-        sub_result = self.parametrize_string(result, args, False)
+        sub_result = self.parametrize_string(result, args)
         while sub_result != result:
-            sub_result = self.parametrize_string(sub_result, args, False)
+            sub_result = self.parametrize_string(sub_result, args)
             result = sub_result
             limit -= 1
             if limit < 0:
@@ -46,7 +47,7 @@ class ParametrizationContext:
 
 
 
-    def parametrize_string(self, string: str, args: dict, wrap = True) -> str:
+    def parametrize_string(self, string: str, args: dict, wrap = False) -> str:
         if string:
 
             context = self.new_data(string, args)

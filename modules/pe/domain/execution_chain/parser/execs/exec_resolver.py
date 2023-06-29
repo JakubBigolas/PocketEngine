@@ -1,7 +1,7 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_chain.parser.execs.handler.cmd_handler import CmdHandler
-from modules.pe.domain.execution_chain.parser.execs.handler.exec_handler_abstract import ExecHandlerAbstract
-from modules.pe.domain.execution_chain.parser.execs.handler.stored_cmd_handler import StoredCmdHandler
+from .handler.cmd_handler import CmdHandler
+from .handler.exec_handler_abstract import ExecHandlerAbstract
+from .handler.stored_cmd_handler import StoredCmdHandler
 
 
 class ExecResolver:

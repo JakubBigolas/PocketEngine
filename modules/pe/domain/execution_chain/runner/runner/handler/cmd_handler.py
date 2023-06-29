@@ -1,14 +1,15 @@
 import subprocess
 from sys import stdout
 
-from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_chain.data.execution_chain_data import ExecutionChainData
-from modules.pe.domain.execution_chain.data.execution_chain_data_cmd import ExecutionChainDataCmd
-from modules.pe.domain.execution_context.data import ExecutionContextData
-from modules.pe.domain.parametrization_context.parametrization_context import ParametrizationContext
 from modules.pe.error import PeError
-from modules.pe.domain.execution_chain.runner.runner.handler import RunnerHandlerAbstract
-from modules.pe.domain.execution_context.data.execution_context_config import ExecutionContextConfig
+from modules.pe.domain.app_context import AppContext
+from modules.pe.domain.execution_context import ExecutionContextData
+from modules.pe.domain.execution_context import ExecutionContextConfig
+from modules.pe.domain.parametrization_context import ParametrizationContext
+
+from ....data.execution_chain_data import ExecutionChainData
+from ....data.execution_chain_data_cmd import ExecutionChainDataCmd
+from .runner_handler_abstract import RunnerHandlerAbstract
 
 
 class CmdHandler(RunnerHandlerAbstract):
@@ -37,7 +38,7 @@ class CmdHandler(RunnerHandlerAbstract):
         if not config.is_dev_mode:
             result = subprocess.run(["bash"], input=command, shell=True, capture_output=False, text=True)
             if result.returncode != 0:
-                PeError("Command {} finished with error code {}".format(command, result.returncode))
+                raise PeError("COMMAND : exit with code {}".format(result.returncode))
 
 
 

@@ -1,8 +1,8 @@
 from copy import deepcopy
 
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_chain.data.execution_chain_data import ExecutionChainData
-from modules.pe.domain.execution_chain.parser.execs.exec_resolver import ExecResolver
+from ..data.execution_chain_data import ExecutionChainData
+from .execs.exec_resolver import ExecResolver
 
 
 class ExecutionChainParser:

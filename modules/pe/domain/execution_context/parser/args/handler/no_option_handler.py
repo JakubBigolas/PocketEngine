@@ -1,6 +1,6 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_context.data import ExecutionContextData
-from modules.pe.domain.execution_context.parser.args.handler.args_context_handler_abstract import ArgsContextHandlerAbstract
+from ....data.execution_context_data import ExecutionContextData
+from .args_context_handler_abstract import ArgsContextHandlerAbstract
 
 
 class NoOptionHandler(ArgsContextHandlerAbstract):

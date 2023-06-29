@@ -1,6 +1,6 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_chain.data.execution_chain_data import ExecutionChainData
-from modules.pe.domain.execution_context.data import ExecutionContextData
+from ....data.execution_chain_data import ExecutionChainData
+from modules.pe.domain.execution_context import ExecutionContextData
 
 
 class RunnerHandlerAbstract:

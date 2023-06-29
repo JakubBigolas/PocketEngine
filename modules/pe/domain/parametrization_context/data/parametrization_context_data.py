@@ -1,6 +1,7 @@
-from modules.pe.domain.parametrization_context.data.parametrization_context_item import ParametrizationContextItem
 from modules.pe.error import PeError
 from modules.pe.utils.color_utils import ColorUtils
+
+from .parametrization_context_item import ParametrizationContextItem
 
 
 class ParametrizationContextData:

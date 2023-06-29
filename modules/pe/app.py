@@ -1,7 +1,6 @@
 import os
 from modules.pe.domain.app_context import AppContext
 from modules.pe.domain.execution_chain import ExecutionChain
-from modules.pe.domain.execution_chain.runner import ExecutionChainRunner
 from modules.pe.domain.execution_context import ExecutionContext
 
 

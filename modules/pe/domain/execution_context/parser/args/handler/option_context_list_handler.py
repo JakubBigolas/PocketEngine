@@ -1,6 +1,6 @@
 from modules.pe.domain.app_context import AppContext
-from modules.pe.domain.execution_context.parser.args.handler.args_context_handler_abstract import ArgsContextHandlerAbstract
-from modules.pe.domain.execution_context.data import ExecutionContextData
+from .args_context_handler_abstract import ArgsContextHandlerAbstract
+from ....data.execution_context_data import ExecutionContextData
 import re
 
 from modules.pe.utils.color_utils import ColorUtils

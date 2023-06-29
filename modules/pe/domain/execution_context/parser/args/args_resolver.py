@@ -1,30 +1,30 @@
 from modules.pe.domain.app_context import AppContext
 from modules.pe.error import PeError
-from modules.pe.domain.execution_context.data import ExecutionContextData
-from modules.pe.domain.execution_context.parser.args.handler import \
-    ArgsHandlerAbstract, \
-    NoOptionHandler, \
-    OptionStartExecutionHandler, \
-    OptionHelpHandler, \
-    OptionVersionHandler, \
-    OptionDevModeHandler, \
-    OptionVerboseHandler, \
-    OptionContextsHandler, \
-    OptionContextListHandler, \
-    OptionContextRmHandler, \
-    OptionContextHandler, \
-    OptionStoreHandler, \
-    OptionDefaultHandler, \
-    OptionSetHandler, \
-    OptionUnsetHandler, \
-    OptionAddHandler, \
-    OptionClearHandler, \
-    OptionContextPathHandler, \
-    OptionCleanupHandler, \
-    OptionExecsHandler, \
-    OptionExecRmHandler, \
-    OptionExecListHandler, \
-    OptionSaveAsHandler
+
+from ...data.execution_context_data import ExecutionContextData
+from .handler.args_handler_abstract import ArgsHandlerAbstract
+from .handler.no_option_handler import NoOptionHandler
+from .handler.option_start_execution_handler import OptionStartExecutionHandler
+from .handler.option_help_handler import OptionHelpHandler
+from .handler.option_version_handler import OptionVersionHandler
+from .handler.option_dev_mode_handler import OptionDevModeHandler
+from .handler.option_verbose_handler import OptionVerboseHandler
+from .handler.option_contexts_handler import OptionContextsHandler
+from .handler.option_context_list_handler import OptionContextListHandler
+from .handler.option_context_rm_handler import OptionContextRmHandler
+from .handler.option_context_handler import OptionContextHandler
+from .handler.option_store_handler import OptionStoreHandler
+from .handler.option_default_handler import OptionDefaultHandler
+from .handler.option_set_handler import OptionSetHandler
+from .handler.option_unset_handler import OptionUnsetHandler
+from .handler.option_add_handler import OptionAddHandler
+from .handler.option_clear_handler import OptionClearHandler
+from .handler.option_context_path_handler import OptionContextPathHandler
+from .handler.option_cleanup_handler import OptionCleanupHandler
+from .handler.option_execs_handler import OptionExecsHandler
+from .handler.option_exec_rm_handler import OptionExecRmHandler
+from .handler.option_exec_list_handler import OptionExecListHandler
+from .handler.option_save_as_handler import OptionSaveAsHandler
 
 
 class ArgsResolver:
