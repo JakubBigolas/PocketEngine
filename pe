@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# POCKET_ENGINE_HOME="C:\Users\jakub.bigolas\OneDrive\PocketEngine"
+POCKET_ENGINE_HOME="C:\Users\jakub.bigolas\OneDrive\PocketEngine"
 
 py "$POCKET_ENGINE_HOME/main.py" "$@"

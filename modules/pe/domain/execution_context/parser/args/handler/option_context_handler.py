@@ -15,7 +15,7 @@ class OptionContextHandler(ArgsContextHandlerAbstract):
             expr=arg.removeprefix("c/")
 
         for item in list(app_context.contexts_list()):
-            if re.search(expr, item):
+            if len(expr) == 0 or re.fullmatch(expr, item):
                 self.read_context(app_context, context_data, item)
 
 

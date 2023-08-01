@@ -18,7 +18,7 @@ class OptionContextListHandler(ArgsContextHandlerAbstract):
             print_details = True
 
         for item in list(app_context.contexts_list()):
-            if re.search(expr, item):
+            if len(expr) == 0 or re.fullmatch(expr, item):
                 self.print_context(app_context, context_data, item, print_details)
         exit(0)
 

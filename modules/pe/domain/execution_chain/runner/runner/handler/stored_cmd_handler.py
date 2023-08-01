@@ -33,7 +33,9 @@ class StoredCmdHandler(RunnerHandlerAbstract):
         exec_uuid = uuid.uuid4()
 
         args_line = ""
-        for arg in args         : args_line += arg + " "
+        for arg in args:
+            if arg is not None:
+                args_line += arg + " "
         if len(args_line) > 0   : args_line = args_line[:-1]
 
         exec_line = ""

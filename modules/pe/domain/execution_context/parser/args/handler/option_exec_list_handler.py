@@ -27,7 +27,7 @@ class OptionExecListHandler(ArgsHandlerAbstract):
             print_details = True
 
         for item in list(app_context.execs_list()):
-            if re.search(expr, item):
+            if len(expr) == 0 or re.fullmatch(expr, item):
                 self.print_exec(app_context, item, print_details)
         exit(0)
 
